@@ -2,169 +2,617 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iris Fruits Deli - Professional Management System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#2d5a27">
+    <title>Irris Fruits Deli - Inventory System</title>
+
     <style>
         :root {
-            --bg-color: #f4f6f0;
-            --primary-green: #1e4620;
-            --accent-green: #388e3c;
-            --text-dark: #212121;
+            --bg-color: #f7f6f0;
+            --primary-green: #2d5a27;
+            --accent-green: #4caf50;
+            --text-dark: #2c2c2c;
             --card-bg: #ffffff;
-            --border-color: #e0e0e0;
-            --danger-red: #d32f2f;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-dark); padding: 16px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        
-        /* Security Shield Entry Cover */
-        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
-        .login-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 32px; width: 100%; max-width: 380px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); text-align: center; }
-        .login-card h2 { color: var(--primary-green); margin-bottom: 8px; font-size: 24px; font-weight: 700; }
-        .login-card p { font-size: 14px; color: #666; margin-bottom: 24px; }
-        .pin-input { width: 100%; padding: 16px; font-size: 24px; text-align: center; letter-spacing: 12px; border: 2px solid var(--border-color); border-radius: 12px; margin-bottom: 20px; font-weight: 700; outline: none; transition: border 0.2s; }
-        .pin-input:focus { border-color: var(--primary-green); }
-        .btn-login { width: 100%; padding: 16px; font-size: 16px; background-color: var(--primary-green); color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; }
-
-        /* Workspace Framework Grid */
-        #main-app { display: none; width: 100%; max-width: 650px; flex-direction: column; gap: 16px; }
-        header { width: 100%; margin-bottom: 8px; text-align: center; }
-        header h1 { color: var(--primary-green); font-size: 26px; font-weight: 700; margin-bottom: 4px; }
-        .status-badge { display: inline-block; font-size: 11px; padding: 2px 10px; border-radius: 20px; font-weight: 700; background-color: #e8f5e9; color: #2e7d32; margin-top: 4px; }
-        
-        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-        .metric-title { font-size: 12px; text-transform: uppercase; color: #666; margin-bottom: 6px; font-weight: 600; letter-spacing: 0.5px; }
-        .metric-value { font-size: 22px; font-weight: 700; color: var(--text-dark); }
-        
-        .section-title { font-size: 16px; font-weight: 700; color: var(--primary-green); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-        .inventory-list { display: flex; flex-direction: column; gap: 10px; }
-        .inventory-item { display: flex; justify-content: space-between; align-items: center; padding: 14px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; }
-        .item-info h3 { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
-        .item-info p { font-size: 13px; color: #666; }
-        .item-actions { display: flex; align-items: center; gap: 12px; }
-        .qty-badge { font-weight: 700; font-size: 16px; min-width: 50px; text-align: center; }
-        
-        button { border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: opacity 0.2s; }
-        button:active { opacity: 0.8; }
-        .btn-sell { background-color: var(--accent-green); color: white; }
-        .btn-edit { background-color: #f5f5f5; color: #424242; padding: 6px 12px; font-size: 12px; }
-
-        /* Advanced Business Logs Display Layout */
-        .logs-container { display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; padding-right: 4px; }
-        .log-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #fafafa; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; }
-        .btn-void { background-color: transparent; color: var(--danger-red); font-size: 12px; padding: 2px 6px; }
-
-        .pipeline-section { display: flex; gap: 10px; }
-        .pipeline-section button { flex: 1; font-size: 13px; padding: 14px; color: white; }
-        .btn-expense { background-color: #795548; }
-        .btn-spoilage { background-color: #607d8b; }
-    </style>
-</head>
-<body>
-
-    <!-- Security Entry Shield Cover Panel Overlay -->
-    <div id="login-overlay">
-        <div class="login-card">
-            <h2>Iris Fruits Deli</h2>
-            <p>Enter Professional Access PIN</p>
-            <input type="password" id="pin-field" class="pin-input" maxlength="4" placeholder="••••" inputmode="numeric">
-            <button type="button" id="login-button" class="btn-login">Unlock System Portal</button>
-        </div>
-    </div>
-
-    <!-- Active Management Workspace Core -->
-    <div id="main-app">
-        <header>
-            <h1>Iris Fruits Deli</h1>
-            <p style="font-size: 13px; color: #666;">Corporate Management Suite <span class="status-badge">● Device Secure Storage</span></p>
-        </header>
-
-        <div class="metrics-grid">
-            <div class="card">
-                <div class="metric-title">Today's Total Sales</div>
-                <div id="metric-sales" class="metric-value">KES 0</div>
-            </div>
-            <div class="card">
-                <div class="metric-title">Net Operating Profit</div>
-                <div id="metric-profit" class="metric-value">KES 0</div>
-            </div>
-            <div class="card" style="grid-column: span 2;">
-                <div class="metric-title">Total Active Stock Value</div>
-                <div id="metric-stock-val" class="metric-value">KES 0</div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="section-title">Live Inventory Ledger</div>
-            <div id="inventory-list-container" class="inventory-list"></div>
-        </div>
-
-        <div class="card">
-            <div class="section-title">Real-Time Transactions Ledger Log</div>
-            <div id="logs-container" class="logs-container">
-                <p style="font-size: 13px; color: #777; text-align: center; padding: 12px;">No transactions logged today.</p>
-            </div>
-        </div>
-
-        <div class="pipeline-section">
-            <button class="btn-expense" id="expense-btn">➕ Log KES 500 Operational Transport</button>
-            <button class="btn-spoilage" id="spoilage-btn">⚠️ Log KES 100 Stock Spoilage</button>
-        </div>
-    </div>
-
-    <script>
-        // Professional Memory Schema (Loads saved settings automatically on launch)
-        let localInventory = JSON.parse(localStorage.getItem('irris_inventory')) || [
-            { name: 'Bananas', quantity: 0, unit: 'bunches', cost_price: 0, selling_price: 0 },
-            { name: 'Mangoes', quantity: 0, unit: 'pieces', cost_price: 0, selling_price: 0 },
-            { name: 'Avocados', quantity: 0, unit: 'pieces', cost_price: 0, selling_price: 0 }
-        ];
-        let salesLog = JSON.parse(localStorage.getItem('irris_sales_log')) || [];
-        let totalExpenses = Number(localStorage.getItem('irris_expenses')) || 0;
-
-        function saveToStorage() {
-            localStorage.setItem('irris_inventory', JSON.stringify(localInventory));
-            localStorage.setItem('irris_sales_log', JSON.stringify(salesLog));
-            localStorage.setItem('irris_expenses', totalExpenses.toString());
+            --border-color: #e5e4de;
         }
 
-        function verifyAccessPIN() {
-            const pinField = document.getElementById('pin-field');
-            if (pinField.value === "3456") {
-                document.getElementById('login-overlay').style.display = 'none';
-                document.getElementById('main-app').style.display = 'flex';
-                renderApp();
-            } else {
-                alert("Incorrect PIN. Entry Denied.");
-                pinField.value = '';
-                pinField.focus();
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-dark);
+            padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+            min-height: 100vh;
+        }
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        button {
+            touch-action: manipulation;
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        #login-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            width: 100%;
+            max-width: 360px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .login-card h2 {
+            color: var(--primary-green);
+            margin-bottom: 8px;
+            font-size: 22px;
+        }
+
+        .login-card p {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .pin-input {
+            width: 100%;
+            padding: 14px;
+            font-size: 20px;
+            text-align: center;
+            letter-spacing: 8px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-weight: 700;
+            outline: none;
+        }
+
+        .pin-input:focus {
+            border-color: var(--primary-green);
+        }
+
+        .login-error {
+            min-height: 20px;
+            color: #b3261e;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+        }
+
+        #main-app {
+            display: none;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        header {
+            width: 100%;
+            margin-bottom: 4px;
+            text-align: center;
+        }
+
+        header h1 {
+            color: var(--primary-green);
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        header p {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+        }
+
+        .metric-card:last-child {
+            grid-column: 1 / -1;
+        }
+
+        .metric-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #777;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        .metric-value {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .section-title {
+            margin-bottom: 12px;
+            color: var(--primary-green);
+            font-size: 17px;
+        }
+
+        .inventory-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .inventory-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+        }
+
+        .item-info {
+            min-width: 0;
+        }
+
+        .item-info h3 {
+            font-size: 16px;
+            margin-bottom: 3px;
+        }
+
+        .item-info p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .item-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .qty-badge {
+            font-weight: 800;
+            font-size: 16px;
+            min-width: 58px;
+            text-align: center;
+        }
+
+        .qty-unit {
+            display: block;
+            font-size: 10px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .btn-sell {
+            background: var(--accent-green);
+            white-space: nowrap;
+        }
+
+        .pipeline-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .pipeline-section button {
+            font-size: 13px;
+            padding: 12px 8px;
+        }
+
+        .btn-expense {
+            background: #795548;
+        }
+
+        .btn-spoilage {
+            background: #607d8b;
+        }
+
+        .status-badge {
+            display: inline-block;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 700;
+            margin-top: 4px;
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .section-head .section-title {
+            margin: 0;
+        }
+
+        .sales-list {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .sale-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+        }
+
+        .sale-row strong {
+            display: block;
+        }
+
+        .sale-row small {
+            color: #666;
+        }
+
+        .sale-right {
+            text-align: right;
+        }
+
+        .btn-edit {
+            margin-top: 5px;
+            background: #eef6f0;
+            color: var(--primary-green);
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+
+        .empty-state {
+            color: #777;
+            text-align: center;
+            padding: 22px 8px;
+        }
+
+        dialog {
+            border: none;
+            border-radius: 18px;
+            width: min(calc(100% - 28px), 440px);
+            padding: 0;
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.3);
+        }
+
+        dialog::backdrop {
+            background: rgba(15, 35, 23, 0.55);
+        }
+
+        .modal {
+            padding: 20px;
+        }
+
+        .modal-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .modal-head h2 {
+            color: var(--primary-green);
+            font-size: 19px;
+        }
+
+        .close-btn {
+            background: #eef1ee;
+            color: #333;
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border-radius: 50%;
+        }
+
+        .field {
+            margin-bottom: 13px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            height: 46px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0 11px;
+            background: white;
+        }
+
+        .field-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 16px;
+        }
+
+        .btn-secondary {
+            background: #eef1ee;
+            color: #333;
+        }
+
+        .btn-danger {
+            background: #b3261e;
+        }
+
+        @media (max-width: 430px) {
+            .inventory-item {
+                align-items: flex-start;
+            }
+
+            .item-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .qty-badge {
+                text-align: center;
             }
         }
+    </style>
+</head>
 
-        function renderApp() {
-            const invContainer = document.getElementById('inventory-list-container');
-            invContainer.innerHTML = '';
-            let currentStockValue = 0;
-            let totalSalesAmount = 0;
+<body>
+    <div id="login-overlay">
+        <div class="login-card">
+            <h2>Irris Fruits Deli</h2>
+            <p>Enter Management Access PIN</p>
 
-            localInventory.forEach((item, index) => {
-                currentStockValue += (Number(item.quantity) * Number(item.cost_price));
-                const row = document.createElement('div');
-                row.className = 'inventory-item';
-                row.innerHTML = `
-                    <div class="item-info">
-                        <h3>${item.name}</h3>
-                        <p>Cost: KES ${item.cost_price} | Retail: KES ${item.selling_price}</p>
-                    </div>
-                    <div class="item-actions">
-                        <button class="btn-edit" onclick="editItemPrompt(${index})">Edit Data</button>
-                        <span class="qty-badge">${item.quantity} <span style="font-size:10px;color:#666;">${item.unit}</span></span>
-                        <button class="btn-sell" onclick="processSale(${index})">Sell 1</button>
-                    </div>
-                `;
-                invContainer.appendChild(row);
-            });
+            <input
+                type="password"
+                id="pin-field"
+                class="pin-input"
+                maxlength="4"
+                placeholder="••••"
+                inputmode="numeric"
+                autocomplete="off"
+                aria-label="Four-digit management PIN"
+            >
 
-            const logContainer = document.getElementById('logs-container');
-            logContainer.innerHTML = '';
+            <div
+                id="login-error"
+                class="login-error"
+                role="alert"
+                aria-live="polite"
+            ></div>
+
+            <button
+                type="button"
+                id="login-button"
+                class="btn-login"
+            >
+                Unlock System
+            </button>
+        </div>
+    </div>
+
+    <main id="main-app">
+        <header>
+            <h1>Irris Fruits Deli</h1>
+
+            <p>
+                Core Business Engine
+                <span class="status-badge">● System Ready</span>
+            </p>
+        </header>
+
+        <section class="metrics-grid" aria-label="Business totals">
+            <div class="card metric-card">
+                <div class="metric-title">Today's Sales</div>
+                <div id="metric-sales" class="metric-value">KES 0</div>
+            </div>
+
+            <div class="card metric-card">
+                <div class="metric-title">Net Profit</div>
+                <div id="metric-profit" class="metric-value">KES 0</div>
+            </div>
+
+            <div class="card metric-card">
+                <div class="metric-title">Current Stock Value</div>
+                <div id="metric-stock-val" class="metric-value">KES 0</div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2 class="section-title">Live Stock &amp; Sales Registry</h2>
+
+            <div
+                id="inventory-list-container"
+                class="inventory-list"
+            ></div>
+        </section>
+
+        <section class="pipeline-section" aria-label="Record expenses">
+            <button
+                type="button"
+                id="transport-button"
+                class="btn-expense"
+            >
+                ➕ Add KES 500 Transport
+            </button>
+
+            <button
+                type="button"
+                id="spoilage-button"
+                class="btn-spoilage"
+            >
+                ⚠️ Add KES 100 Spoilage
+            </button>
+        </section>
+
+        <section class="card">
+            <div class="section-head">
+                <h2 class="section-title">Sales History</h2>
+                <span class="status-badge">Editable</span>
+            </div>
+
+            <div id="sales-history" class="sales-list"></div>
+        </section>
+    </main>
+
+    <dialog id="edit-sale-dialog">
+        <form id="edit-sale-form" class="modal">
+            <div class="modal-head">
+                <h2>Edit Sale</h2>
+
+                <button
+                    type="button"
+                    id="close-edit"
+                    class="close-btn"
+                >
+                    ×
+                </button>
+            </div>
+
+            <input id="edit-sale-id" type="hidden">
+
+            <div class="field">
+                <label for="edit-fruit">Fruit</label>
+                <select id="edit-fruit" required></select>
+            </div>
+
+            <div class="field-grid">
+                <div class="field">
+                    <label for="edit-qty">Quantity</label>
+
+                    <input
+                        id="edit-qty"
+                        type="number"
+                        min="1"
+                        step="1"
+                        required
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="edit-price">Price each (KES)</label>
+
+                    <input
+                        id="edit-price"
+                        type="number"
+                        min="0"
+                        step="1"
+                        required
+                    >
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="edit-payment">Payment</label>
+
+                <select id="edit-payment">
+                    <option>M-Pesa</option>
+                    <option>Cash</option>
+                    <option>Bank</option>
+                    <option>Credit</option>
+                </select>
+            </div>
+
+            <div class="modal-actions">
+                <button
+                    type="button"
+                    id="void-sale"
+                    class="btn-danger"
+                >
+                    Void Sale
+                </button>
+
+                <button
+                    type="button"
+                    id="cancel-edit"
+                    class="btn-secondary"
+                >
+                    Cancel
+                </button>
+
+                <button type="submit">Save Changes</button>
+            </div>
+        </form>
+    </dialog>
+
+    <script>
+        'use strict';
+
+        const MASTER_PIN = '3456';
+        const STORAGE_KEY = 'irris-fruits-deli-v2';
+
+        const DEFAULT_STATE = {
+            inventory: [
+                {
+                    name: 'Bananas',
+                    quantity: 50,
+                    unit: 'bunches',
+                    cost_price: 150,
+                    selling_price: 200
+                },
+                {
+                    name: 'Mangoes',
+                    quantity:
