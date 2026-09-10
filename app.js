@@ -1,4 +1,4 @@
-const SUPABASE_URL='https://xvyzwrkkvvpoqwlanaas.supabase.co';
+const SUPABASE_URL='https://xvyzwrkkvypoqwlanaas.supabase.co';
 const SUPABASE_KEY='sb_publishable_q08Iv5vIYTIhvs-IwSQcNg_6xXwF3';
 const OWNER_EMAIL='nishagolden50@gmail.com';
 const client=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
