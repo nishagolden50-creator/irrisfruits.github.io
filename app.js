@@ -1,5 +1,5 @@
-const SUPABASE_URL='https://xvyzwrkkvypoqwlanaas.supabase.co';
-const SUPABASE_KEY='sb_publishable_q08Iv5vIYTIhvs-IwSQcNg_6xXwF3';
+const SUPABASE_URL='https://xvyzwrkkvvpoqwlanaas.supabase.co';
+const SUPABASE_KEY='sb_publishable_q08Iv5vIYTIhvs-IwSQcNg_6xXwFNbF';
 const OWNER_EMAIL='nishagolden50@gmail.com';
 const client=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];let inventory=[],sales=[],expenses=[],user=null;
