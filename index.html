@@ -1,170 +1,1177 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iris Fruits Deli - Corporate Management System</title>
-    <style>
-        :root {
-            --bg-color: #f4f6f0;
-            --primary-green: #1e4620;
-            --accent-green: #388e3c;
-            --text-dark: #212121;
-            --card-bg: #ffffff;
-            --border-color: #e0e0e0;
-            --danger-red: #d32f2f;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-dark); padding: 16px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        
-        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
-        .login-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 32px; width: 100%; max-width: 380px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); text-align: center; }
-        .login-card h2 { color: var(--primary-green); margin-bottom: 8px; font-size: 24px; font-weight: 700; }
-        .login-card p { font-size: 14px; color: #666; margin-bottom: 24px; }
-        .pin-input { width: 100%; padding: 16px; font-size: 24px; text-align: center; letter-spacing: 12px; border: 2px solid var(--border-color); border-radius: 12px; margin-bottom: 20px; font-weight: 700; outline: none; transition: border 0.2s; }
-        .pin-input:focus { border-color: var(--primary-green); }
-        .btn-login { width: 100%; padding: 16px; font-size: 16px; background-color: var(--primary-green); color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#214f34">
+<title>Irris Fruits Deli</title>
 
-        #main-app { display: none; width: 100%; max-width: 650px; flex-direction: column; gap: 16px; }
-        header { width: 100%; margin-bottom: 8px; text-align: center; }
-        header h1 { color: var(--primary-green); font-size: 26px; font-weight: 700; margin-bottom: 4px; }
-        .status-badge { display: inline-block; font-size: 11px; padding: 2px 10px; border-radius: 20px; font-weight: 700; background-color: #e8f5e9; color: #2e7d32; margin-top: 4px; }
-        
-        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-        .metric-title { font-size: 12px; text-transform: uppercase; color: #666; margin-bottom: 6px; font-weight: 600; letter-spacing: 0.5px; }
-        .metric-value { font-size: 22px; font-weight: 700; color: var(--text-dark); }
-        
-        .section-title { font-size: 16px; font-weight: 700; color: var(--primary-green); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-        .inventory-list { display: flex; flex-direction: column; gap: 10px; }
-        .inventory-item { display: flex; justify-content: space-between; align-items: center; padding: 14px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; }
-        .item-info h3 { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
-        .item-info p { font-size: 13px; color: #666; }
-        .item-actions { display: flex; align-items: center; gap: 12px; }
-        .qty-badge { font-weight: 700; font-size: 16px; min-width: 50px; text-align: center; }
-        
-        button { border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: opacity 0.2s; }
-        button:active { opacity: 0.8; }
-        .btn-sell { background-color: var(--accent-green); color: white; }
-        .btn-edit { background-color: #f5f5f5; color: #424242; padding: 6px 12px; font-size: 12px; }
+<style>
+:root {
+    --green: #214f34;
+    --light-green: #4caf50;
+    --background: #f5f6f2;
+    --white: #ffffff;
+    --text: #252a27;
+    --muted: #6d756f;
+    --border: #dfe5df;
+    --red: #b42318;
+    --brown: #795548;
+    --blue-grey: #607d8b;
+}
 
-        .logs-container { display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; padding-right: 4px; }
-        .log-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #fafafa; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; }
-        .btn-void { background-color: transparent; color: var(--danger-red); font-size: 12px; padding: 2px 6px; }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-        .pipeline-section { display: flex; gap: 10px; }
-        .pipeline-section button { flex: 1; font-size: 13px; padding: 14px; color: white; }
-        .btn-expense { background-color: #795548; }
-        .btn-spoilage { background-color: #607d8b; }
-    </style>
+body {
+    min-height: 100vh;
+    padding: 16px;
+    background: var(--background);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+button,
+input,
+select {
+    font: inherit;
+}
+
+button {
+    border: none;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* LOGIN */
+
+#login-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: linear-gradient(145deg, #173a26, #2f6c47);
+}
+
+.login-card {
+    width: 100%;
+    max-width: 370px;
+    padding: 28px;
+    border-radius: 22px;
+    background: var(--white);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    text-align: center;
+}
+
+.logo {
+    width: 62px;
+    height: 62px;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 16px;
+    border-radius: 18px;
+    background: var(--green);
+    font-size: 30px;
+}
+
+.login-card h1 {
+    margin-bottom: 6px;
+    color: var(--green);
+    font-size: 25px;
+}
+
+.login-card p {
+    margin-bottom: 20px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+#pin-input {
+    width: 100%;
+    height: 56px;
+    padding: 0 14px;
+    border: 2px solid var(--border);
+    border-radius: 13px;
+    outline: none;
+    text-align: center;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 10px;
+}
+
+#pin-input:focus {
+    border-color: var(--green);
+}
+
+#login-error {
+    min-height: 25px;
+    padding-top: 6px;
+    color: var(--red);
+    font-size: 13px;
+}
+
+.login-button {
+    width: 100%;
+    min-height: 52px;
+    border-radius: 12px;
+    background: var(--green);
+    color: white;
+    font-weight: 800;
+    font-size: 16px;
+}
+
+/* MAIN APP */
+
+#main-app {
+    display: none;
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    padding-bottom: 30px;
+}
+
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.app-header h1 {
+    color: var(--green);
+    font-size: 23px;
+}
+
+.app-header p {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.lock-button {
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: white;
+    font-size: 19px;
+}
+
+/* DASHBOARD */
+
+.metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 11px;
+    margin-bottom: 15px;
+}
+
+.card {
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: white;
+    box-shadow: 0 3px 12px rgba(32,79,52,0.04);
+}
+
+.metric:last-child {
+    grid-column: 1 / -1;
+}
+
+.metric-label {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.metric-value {
+    display: block;
+    margin-top: 7px;
+    font-size: 22px;
+    font-weight: 850;
+}
+
+.section {
+    margin-bottom: 15px;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 13px;
+}
+
+.section-header h2 {
+    color: var(--green);
+    font-size: 18px;
+}
+
+.badge {
+    padding: 4px 9px;
+    border-radius: 20px;
+    background: #e8f5e9;
+    color: #2e7d32;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+/* INVENTORY AND SALES */
+
+.inventory-list,
+.sales-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.inventory-row,
+.sale-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 13px;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    background: white;
+}
+
+.row-title {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.row-description {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.row-actions {
+    text-align: right;
+}
+
+.stock-quantity {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 850;
+}
+
+.sell-button {
+    padding: 9px 13px;
+    border-radius: 9px;
+    background: var(--light-green);
+    color: white;
+    font-weight: 800;
+}
+
+.sell-button:disabled {
+    opacity: 0.5;
+}
+
+.edit-button {
+    padding: 7px 10px;
+    border-radius: 8px;
+    background: #edf5ef;
+    color: var(--green);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.expense-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.expense-buttons button {
+    min-height: 50px;
+    padding: 10px;
+    border-radius: 12px;
+    color: white;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.transport-button {
+    background: var(--brown);
+}
+
+.spoilage-button {
+    background: var(--blue-grey);
+}
+
+.empty-message {
+    padding: 24px 10px;
+    color: var(--muted);
+    text-align: center;
+}
+
+/* EDIT SALE WINDOW */
+
+dialog {
+    width: min(calc(100% - 28px), 460px);
+    padding: 0;
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.35);
+}
+
+dialog::backdrop {
+    background: rgba(8,30,17,0.58);
+}
+
+.modal {
+    padding: 21px;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.modal-header h2 {
+    color: var(--green);
+    font-size: 20px;
+}
+
+.close-button {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #edf0ed;
+    color: var(--text);
+    font-size: 20px;
+}
+
+.field {
+    margin-bottom: 14px;
+}
+
+.field label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.field input,
+.field select {
+    width: 100%;
+    height: 47px;
+    padding: 0 12px;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    background: white;
+}
+
+.field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 18px;
+}
+
+.modal-actions button {
+    padding: 11px 13px;
+    border-radius: 10px;
+    font-weight: 800;
+}
+
+.cancel-button {
+    background: #edf0ed;
+    color: var(--text);
+}
+
+.save-button {
+    background: var(--green);
+    color: white;
+}
+
+.void-button {
+    margin-right: auto;
+    background: var(--red);
+    color: white;
+}
+
+@media (max-width: 430px) {
+    .field-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .modal-actions {
+        flex-wrap: wrap;
+    }
+}
+</style>
 </head>
+
 <body>
 
-    <div id="login-overlay">
-        <div class="login-card">
-            <h2>Iris Fruits Deli</h2>
-            <p>Enter Master Management Access PIN</p>
-            <input type="password" id="pin-field" class="pin-input" maxlength="4" placeholder="••••" inputmode="numeric">
-            <button type="button" id="login-button" class="btn-login">Unlock System Portal</button>
-        </div>
+<!-- LOGIN SCREEN -->
+
+<section id="login-screen">
+    <div class="login-card">
+        <div class="logo">🍊</div>
+
+        <h1>Irris Fruits Deli</h1>
+
+        <p>Enter your management PIN to continue</p>
+
+        <input
+            id="pin-input"
+            type="password"
+            inputmode="numeric"
+            maxlength="4"
+            placeholder="••••"
+            autocomplete="off"
+        >
+
+        <div id="login-error"></div>
+
+        <button
+            type="button"
+            class="login-button"
+            onclick="unlockApp()"
+        >
+            Unlock System
+        </button>
     </div>
+</section>
 
-    <div id="main-app">
-        <header>
-            <h1>Iris Fruits Deli</h1>
-            <p style="font-size: 13px; color: #666;">Corporate Management Suite <span class="status-badge">● Device Secure Storage</span></p>
-        </header>
+<!-- MAIN APPLICATION -->
 
-        <div class="metrics-grid">
-            <div class="card">
-                <div class="metric-title">Today's Total Sales</div>
-                <div id="metric-sales" class="metric-value">KES 0</div>
+<main id="main-app">
+    <header class="app-header">
+        <div>
+            <h1>Irris Fruits Deli</h1>
+            <p>Inventory and sales management</p>
+        </div>
+
+        <button
+            type="button"
+            class="lock-button"
+            onclick="lockApp()"
+        >
+            🔒
+        </button>
+    </header>
+
+    <section class="metrics">
+        <article class="card metric">
+            <span class="metric-label">Total Sales</span>
+            <strong id="sales-total" class="metric-value">KES 0</strong>
+        </article>
+
+        <article class="card metric">
+            <span class="metric-label">Net Profit</span>
+            <strong id="profit-total" class="metric-value">KES 0</strong>
+        </article>
+
+        <article class="card metric">
+            <span class="metric-label">Current Stock Value</span>
+            <strong id="stock-value" class="metric-value">KES 0</strong>
+        </article>
+    </section>
+
+    <section class="card section">
+        <div class="section-header">
+            <h2>Live Stock</h2>
+            <span class="badge">System ready</span>
+        </div>
+
+        <div id="inventory-list" class="inventory-list"></div>
+    </section>
+
+    <section class="expense-buttons">
+        <button
+            type="button"
+            class="transport-button"
+            onclick="addExpense(500, 'Transport')"
+        >
+            + KES 500 Transport
+        </button>
+
+        <button
+            type="button"
+            class="spoilage-button"
+            onclick="addExpense(100, 'Spoilage')"
+        >
+            + KES 100 Spoilage
+        </button>
+    </section>
+
+    <section class="card section">
+        <div class="section-header">
+            <h2>Sales History</h2>
+            <span class="badge">Editable</span>
+        </div>
+
+        <div id="sales-history" class="sales-list"></div>
+    </section>
+</main>
+
+<!-- EDIT SALE WINDOW -->
+
+<dialog id="edit-dialog">
+    <form id="edit-form" class="modal">
+        <div class="modal-header">
+            <h2>Edit Sale</h2>
+
+            <button
+                type="button"
+                class="close-button"
+                onclick="closeEditDialog()"
+            >
+                ×
+            </button>
+        </div>
+
+        <input id="edit-sale-id" type="hidden">
+
+        <div class="field">
+            <label for="edit-fruit">Fruit</label>
+            <select id="edit-fruit" required></select>
+        </div>
+
+        <div class="field-grid">
+            <div class="field">
+                <label for="edit-quantity">Quantity</label>
+
+                <input
+                    id="edit-quantity"
+                    type="number"
+                    min="1"
+                    step="1"
+                    required
+                >
             </div>
-            <div class="card">
-                <div class="metric-title">Net Operating Profit</div>
-                <div id="metric-profit" class="metric-value">KES 0</div>
-            </div>
-            <div class="card" style="grid-column: span 2;">
-                <div class="metric-title">Total Active Stock Value</div>
-                <div id="metric-stock-val" class="metric-value">KES 0</div>
+
+            <div class="field">
+                <label for="edit-price">Price each (KES)</label>
+
+                <input
+                    id="edit-price"
+                    type="number"
+                    min="0"
+                    step="1"
+                    required
+                >
             </div>
         </div>
 
-        <div class="card">
-            <div class="section-title">Live Inventory Ledger</div>
-            <div id="inventory-list-container" class="inventory-list"></div>
+        <div class="field">
+            <label for="edit-payment">Payment method</label>
+
+            <select id="edit-payment">
+                <option value="M-Pesa">M-Pesa</option>
+                <option value="Cash">Cash</option>
+                <option value="Bank">Bank</option>
+                <option value="Credit">Credit</option>
+            </select>
         </div>
 
-        <div class="card">
-            <div class="section-title">Real-Time Transactions Ledger Log</div>
-            <div id="logs-container" class="logs-container">
-                <p style="font-size: 13px; color: #777; text-align: center; padding: 12px;">No transactions logged today.</p>
-            </div>
+        <div class="modal-actions">
+            <button
+                type="button"
+                class="void-button"
+                onclick="voidCurrentSale()"
+            >
+                Void Sale
+            </button>
+
+            <button
+                type="button"
+                class="cancel-button"
+                onclick="closeEditDialog()"
+            >
+                Cancel
+            </button>
+
+            <button type="submit" class="save-button">
+                Save Changes
+            </button>
         </div>
+    </form>
+</dialog>
 
-        <div class="pipeline-section">
-            <button class="btn-expense" id="expense-btn">➕ Log KES 500 Operational Transport</button>
-            <button class="btn-spoilage" id="spoilage-btn">⚠️ Log KES 100 Stock Spoilage</button>
-        </div>
-    </div>
+<script>
+var MASTER_PIN = "3456";
+var STORAGE_KEY = "irris-fruits-working-v1";
 
-    <script>
-        let localInventory = JSON.parse(localStorage.getItem('irris_inventory')) || [
-            { name: 'Bananas', quantity: 50, unit: 'bunches', cost_price: 150, selling_price: 200 },
-            { name: 'Mangoes', quantity: 80, unit: 'pieces', cost_price: 30, selling_price: 50 },
-            { name: 'Avocados', quantity: 100, unit: 'pieces', cost_price: 20, selling_price: 40 }
-        ];
-        let salesLog = JSON.parse(localStorage.getItem('irris_sales_log')) || [];
-        let totalExpenses = Number(localStorage.getItem('irris_expenses')) || 0;
+var defaultData = {
+    inventory: [
+        {
+            name: "Bananas",
+            quantity: 50,
+            unit: "bunches",
+            costPrice: 150,
+            sellingPrice: 200
+        },
+        {
+            name: "Mangoes",
+            quantity: 80,
+            unit: "pieces",
+            costPrice: 30,
+            sellingPrice: 50
+        },
+        {
+            name: "Avocados",
+            quantity: 100,
+            unit: "pieces",
+            costPrice: 20,
+            sellingPrice: 40
+        }
+    ],
+    sales: [],
+    expenses: []
+};
 
-        function saveToStorage() {
-            localStorage.setItem('irris_inventory', JSON.stringify(localInventory));
-            localStorage.setItem('irris_sales_log', JSON.stringify(salesLog));
-            localStorage.setItem('irris_expenses', totalExpenses.toString());
+var businessData = loadBusinessData();
+
+function cloneDefaultData() {
+    return JSON.parse(JSON.stringify(defaultData));
+}
+
+function loadBusinessData() {
+    try {
+        var savedData = localStorage.getItem(STORAGE_KEY);
+
+        if (!savedData) {
+            return cloneDefaultData();
         }
 
-        function verifyAccessPIN() {
-            const pinField = document.getElementById('pin-field');
-            if (pinField.value === "3456") {
-                document.getElementById('login-overlay').style.display = 'none';
-                document.getElementById('main-app').style.display = 'flex';
-                renderApp();
-            } else {
-                alert("Incorrect Security PIN.");
-                pinField.value = '';
-                pinField.focus();
-            }
+        var parsedData = JSON.parse(savedData);
+
+        if (
+            !parsedData ||
+            !Array.isArray(parsedData.inventory) ||
+            !Array.isArray(parsedData.sales) ||
+            !Array.isArray(parsedData.expenses)
+        ) {
+            return cloneDefaultData();
         }
 
-        function renderApp() {
-            const invContainer = document.getElementById('inventory-list-container');
-            invContainer.innerHTML = '';
-            let currentStockValue = 0;
-            let totalSalesAmount = 0;
+        return parsedData;
+    } catch (error) {
+        return cloneDefaultData();
+    }
+}
 
-            localInventory.forEach((item, index) => {
-                currentStockValue += (Number(item.quantity) * Number(item.cost_price));
-                const row = document.createElement('div');
-                row.className = 'inventory-item';
-                row.innerHTML = `
-                    <div class="item-info">
-                        <h3>${item.name}</h3>
-                        <p>Cost: KES ${item.cost_price} | Retail: KES ${item.selling_price}</p>
-                    </div>
-                    <div class="item-actions">
-                        <button class="btn-edit" onclick="editItemPrompt(${index})">Edit Data</button>
-                        <span class="qty-badge">${item.quantity} <span style="font-size:10px;color:#666;">${item.unit}</span></span>
-                        <button class="btn-sell" onclick="processSale(${index})">Sell 1</button>
-                    </div>
-                `;
-                invContainer.appendChild(row);
-            });
+function saveBusinessData() {
+    try {
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(businessData)
+        );
+    } catch (error) {
+        alert("The browser could not save your latest changes.");
+    }
+}
 
-            const logContainer = document.getElementById('logs-container');
-            logContainer.innerHTML = '';
-            
-            if (salesLog.length === 0 && totalExpenses === 0) {
-                logContainer.innerHTML = `<p style="font-size: 13px; color: #777; text-align: center; padding: 12px;">No transactions logged today.</p>`;
-            } else {
-                salesLog.forEach((log, idx) => {
-                    totalSalesAmount += log.price;
+function formatMoney(amount) {
+    return "KES " + Number(amount || 0).toLocaleString("en-KE");
+}
+
+function createId() {
+    return (
+        Date.now().toString(36) +
+        Math.random().toString(36).substring(2, 8)
+    );
+}
+
+/* LOGIN FUNCTIONS */
+
+function unlockApp() {
+    var pinInput = document.getElementById("pin-input");
+    var loginError = document.getElementById("login-error");
+
+    var enteredPin = String(pinInput.value)
+        .replace(/[^0-9]/g, "");
+
+    if (enteredPin === MASTER_PIN) {
+        loginError.textContent = "";
+
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("main-app").style.display = "block";
+
+        renderApplication();
+    } else {
+        loginError.textContent = "Incorrect PIN. Please try again.";
+        pinInput.value = "";
+        pinInput.focus();
+    }
+}
+
+function lockApp() {
+    document.getElementById("main-app").style.display = "none";
+    document.getElementById("login-screen").style.display = "flex";
+    document.getElementById("pin-input").value = "";
+    document.getElementById("login-error").textContent = "";
+    document.getElementById("pin-input").focus();
+}
+
+/* RENDER APPLICATION */
+
+function renderApplication() {
+    renderInventory();
+    renderSalesHistory();
+    renderMetrics();
+}
+
+function renderInventory() {
+    var inventoryList = document.getElementById("inventory-list");
+
+    inventoryList.innerHTML = "";
+
+    businessData.inventory.forEach(function(item, itemIndex) {
+        var row = document.createElement("div");
+        row.className = "inventory-row";
+
+        var information = document.createElement("div");
+
+        var title = document.createElement("strong");
+        title.className = "row-title";
+        title.textContent = item.name;
+
+        var description = document.createElement("div");
+        description.className = "row-description";
+        description.textContent =
+            "Cost " +
+            formatMoney(item.costPrice) +
+            " • Sell " +
+            formatMoney(item.sellingPrice);
+
+        information.appendChild(title);
+        information.appendChild(description);
+
+        var actions = document.createElement("div");
+        actions.className = "row-actions";
+
+        var quantity = document.createElement("span");
+        quantity.className = "stock-quantity";
+        quantity.textContent =
+            item.quantity + " " + item.unit;
+
+        var sellButton = document.createElement("button");
+        sellButton.type = "button";
+        sellButton.className = "sell-button";
+
+        if (Number(item.quantity) > 0) {
+            sellButton.textContent = "Sell 1";
+
+            sellButton.onclick = function() {
+                recordSale(itemIndex);
+            };
+        } else {
+            sellButton.textContent = "Out of stock";
+            sellButton.disabled = true;
+        }
+
+        actions.appendChild(quantity);
+        actions.appendChild(sellButton);
+
+        row.appendChild(information);
+        row.appendChild(actions);
+
+        inventoryList.appendChild(row);
+    });
+}
+
+function recordSale(itemIndex) {
+    var item = businessData.inventory[itemIndex];
+
+    if (!item || Number(item.quantity) < 1) {
+        alert("This item is out of stock.");
+        return;
+    }
+
+    item.quantity = Number(item.quantity) - 1;
+
+    businessData.sales.push({
+        id: createId(),
+        itemIndex: itemIndex,
+        name: item.name,
+        quantity: 1,
+        sellingPrice: Number(item.sellingPrice),
+        costPrice: Number(item.costPrice),
+        payment: "M-Pesa",
+        date: new Date().toISOString()
+    });
+
+    saveBusinessData();
+    renderApplication();
+}
+
+/* SALES HISTORY */
+
+function renderSalesHistory() {
+    var historyContainer =
+        document.getElementById("sales-history");
+
+    historyContainer.innerHTML = "";
+
+    if (businessData.sales.length === 0) {
+        historyContainer.innerHTML =
+            '<div class="empty-message">No sales recorded yet.</div>';
+
+        return;
+    }
+
+    var reversedSales = businessData.sales.slice().reverse();
+
+    reversedSales.forEach(function(sale) {
+        var row = document.createElement("div");
+        row.className = "sale-row";
+
+        var information = document.createElement("div");
+
+        var title = document.createElement("strong");
+        title.className = "row-title";
+        title.textContent =
+            sale.name + " × " + sale.quantity;
+
+        var description = document.createElement("div");
+        description.className = "row-description";
+        description.textContent =
+            new Date(sale.date).toLocaleString("en-KE") +
+            " • " +
+            sale.payment;
+
+        information.appendChild(title);
+        information.appendChild(description);
+
+        var actions = document.createElement("div");
+        actions.className = "row-actions";
+
+        var amount = document.createElement("strong");
+        amount.className = "stock-quantity";
+        amount.textContent = formatMoney(
+            Number(sale.quantity) *
+            Number(sale.sellingPrice)
+        );
+
+        var editButton = document.createElement("button");
+        editButton.type = "button";
+        editButton.className = "edit-button";
+        editButton.textContent = "Edit Sale";
+
+        editButton.onclick = function() {
+            openEditDialog(sale.id);
+        };
+
+        actions.appendChild(amount);
+        actions.appendChild(editButton);
+
+        row.appendChild(information);
+        row.appendChild(actions);
+
+        historyContainer.appendChild(row);
+    });
+}
+
+/* DASHBOARD TOTALS */
+
+function renderMetrics() {
+    var totalSales = businessData.sales.reduce(
+        function(total, sale) {
+            return (
+                total +
+                Number(sale.quantity) *
+                Number(sale.sellingPrice)
+            );
+        },
+        0
+    );
+
+    var costOfGoodsSold = businessData.sales.reduce(
+        function(total, sale) {
+            return (
+                total +
+                Number(sale.quantity) *
+                Number(sale.costPrice)
+            );
+        },
+        0
+    );
+
+    var totalExpenses = businessData.expenses.reduce(
+        function(total, expense) {
+            return total + Number(expense.amount);
+        },
+        0
+    );
+
+    var stockValue = businessData.inventory.reduce(
+        function(total, item) {
+            return (
+                total +
+                Number(item.quantity) *
+                Number(item.costPrice)
+            );
+        },
+        0
+    );
+
+    var netProfit =
+        totalSales -
+        costOfGoodsSold -
+        totalExpenses;
+
+    document.getElementById("sales-total").textContent =
+        formatMoney(totalSales);
+
+    document.getElementById("profit-total").textContent =
+        formatMoney(netProfit);
+
+    document.getElementById("stock-value").textContent =
+        formatMoney(stockValue);
+}
+
+/* EXPENSES */
+
+function addExpense(amount, category) {
+    businessData.expenses.push({
+        id: createId(),
+        amount: Number(amount),
+        category: category,
+        date: new Date().toISOString()
+    });
+
+    saveBusinessData();
+    renderApplication();
+
+    alert(
+        formatMoney(amount) +
+        " " +
+        category +
+        " expense recorded."
+    );
+}
+
+/* EDIT SALES */
+
+function findSaleById(saleId) {
+    return businessData.sales.find(function(sale) {
+        return sale.id === saleId;
+    });
+}
+
+function openEditDialog(saleId) {
+    var sale = findSaleById(saleId);
+
+    if (!sale) {
+        return;
+    }
+
+    var fruitSelect =
+        document.getElementById("edit-fruit");
+
+    fruitSelect.innerHTML = "";
+
+    businessData.inventory.forEach(function(item, index) {
+        var option = document.createElement("option");
+
+        option.value = String(index);
+
+        option.textContent =
+            item.name +
+            " — " +
+            item.quantity +
+            " " +
+            item.unit +
+            " available";
+
+        if (index === Number(sale.itemIndex)) {
+            option.selected = true;
+        }
+
+        fruitSelect.appendChild(option);
+    });
+
+    document.getElementById("edit-sale-id").value =
+        sale.id;
+
+    document.getElementById("edit-quantity").value =
+        sale.quantity;
+
+    document.getElementById("edit-price").value =
+        sale.sellingPrice;
+
+    document.getElementById("edit-payment").value =
+        sale.payment;
+
+    document.getElementById("edit-dialog").showModal();
+}
+
+function closeEditDialog() {
+    document.getElementById("edit-dialog").close();
+}
+
+function saveEditedSale(event) {
+    event.preventDefault();
+
+    var saleId =
+        document.getElementById("edit-sale-id").value;
+
+    var sale = findSaleById(saleId);
+
+    if (!sale) {
+        return;
+    }
+
+    var originalItem =
+        businessData.inventory[sale.itemIndex];
+
+    var originalQuantity = Number(sale.quantity);
+
+    if (originalItem) {
+        originalItem.quantity =
+            Number(originalItem.quantity) +
+            originalQuantity;
+    }
+
+    var newItemIndex =
+        Number(document.getElementById("edit-fruit").value);
+
+    var newItem =
+        businessData.inventory[newItemIndex];
+
+    var newQuantity =
+        Number(document.getElementById("edit-quantity").value);
+
+    var newPrice =
+        Number(document.getElementById("edit-price").value);
+
+    if (
+        !newItem ||
+        newQuantity < 1 ||
+        newQuantity > Number(newItem.quantity)
+    ) {
+        if (originalItem) {
+            originalItem.quantity =
+                Number(originalItem.quantity) -
+                originalQuantity;
+        }
+
+        alert(
+            newItem
+                ? "Not enough stock. Available: " +
+                  newItem.quantity
+                : "Please select a fruit."
+        );
+
+        return;
+    }
+
+    newItem.quantity =
+        Number(newItem.quantity) -
+        newQuantity;
+
+    sale.itemIndex = newItemIndex;
+    sale.name = newItem.name;
+    sale.quantity = newQuantity;
+    sale.sellingPrice = newPrice;
+    sale.costPrice = Number(newItem.costPrice);
+    sale.payment =
+        document.getElementById("edit-payment").value;
+
+    saveBusinessData();
+    closeEditDialog();
+    renderApplication();
+}
+
+function voidCurrentSale() {
+    var saleId =
+        document.getElementById("edit-sale-id").value;
+
+    var sale = findSaleById(saleId);
+
+    if (!sale) {
+        return;
+    }
+
+    var shouldVoid = confirm(
+        "Void this sale and return its quantity to stock?"
+    );
+
+    if (!shouldVoid) {
+        return;
+    }
+
+    var item =
+        businessData.inventory[sale.itemIndex];
+
+    if (item) {
+        item.quantity =
+            Number(item.quantity) +
+            Number(sale.quantity);
+    }
+
+    businessData.sales =
+        businessData.sales.filter(function(entry) {
+            return entry.id !== saleId;
+        });
+
+    saveBusinessData();
+    closeEditDialog();
+    renderApplication();
+}
+
+/* EVENT LISTENERS */
+
+document
+    .getElementById("edit-form")
+    .addEventListener("submit", saveEditedSale);
+
+document
+    .getElementById("pin-input")
+    .addEventListener("input", function() {
+        this.value = this.value
+            .replace(/[^0-9]/g, "")
+            .slice(0, 4);
+
+        document.getElementById(
+            "login-error"
+        ).textContent = "";
+    });
+
+document
+    .getElementById("pin-input")
+    .addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            unlockApp();
+        }
+    });
+
+document.getElementById("pin-input").focus();
+</script>
+
+</body>
+</html>
