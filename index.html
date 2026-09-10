@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iris Fruits Deli - Inventory System</title>
-    <!-- Solid, Fixed Supabase Connection Links -->
-    <script src="https://jsdelivr.net"></script>
     <style>
         :root {
             --bg-color: #f7f6f0;
@@ -14,11 +12,11 @@
             --text-dark: #2c2c2c;
             --card-bg: #ffffff;
             --border-color: #e5e4de;
-            --attention-color: #d32f2f;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-dark); padding: 16px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
+        /* Security Entry Shield Overlay */
         #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
         .login-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-align: center; }
         .login-card h2 { color: var(--primary-green); margin-bottom: 8px; font-size: 22px; }
@@ -27,6 +25,7 @@
         .pin-input:focus { border-color: var(--primary-green); }
         .btn-login { width: 100%; padding: 14px; font-size: 16px; background-color: var(--primary-green); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
 
+        /* Main Workspace Framework Panel */
         #main-app { display: none; width: 100%; max-width: 600px; flex-direction: column; gap: 16px; }
         header { width: 100%; margin-bottom: 20px; text-align: center; }
         header h1 { color: var(--primary-green); font-size: 24px; font-weight: 700; margin-bottom: 4px; }
@@ -41,7 +40,6 @@
         .item-actions { display: flex; align-items: center; gap: 12px; }
         .qty-badge { font-weight: 700; font-size: 16px; min-width: 40px; text-align: center; }
         button { background-color: var(--primary-green); color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        button:active { opacity: 0.8; }
         .btn-sell { background-color: var(--accent-green); }
         
         .pipeline-section { display: flex; gap: 10px; }
@@ -54,6 +52,7 @@
 </head>
 <body>
 
+    <!-- Access Gate Screen Overlay Panel -->
     <div id="login-overlay">
         <div class="login-card">
             <h2>Iris Fruits Deli</h2>
@@ -63,10 +62,11 @@
         </div>
     </div>
 
+    <!-- Protected Live Application Interface -->
     <div id="main-app">
         <header>
             <h1>Iris Fruits Deli</h1>
-            <p style="font-size: 13px; color: #666;">Cloud Management System <span class="status-badge status-live">● Live Cloud</span></p>
+            <p style="font-size: 13px; color: #666;">Core Business Engine <span class="status-badge status-live">● System Standalone</span></p>
         </header>
 
         <div class="metrics-grid">
@@ -90,23 +90,13 @@
         </div>
 
         <div class="pipeline-section">
-            <button class="btn-expense" onclick="logExpense(500, 'Transport & Packing')">➕ Add KES 500 Transport</button>
-            <button class="btn-spoilage" onclick="logExpense(100, 'Fruit Spoilage')">⚠️ Add KES 100 Spoilage</button>
+            <button class="btn-expense" onclick="logExpense(500)">➕ Add KES 500 Transport</button>
+            <button class="btn-spoilage" onclick="logExpense(100)">⚠️ Add KES 100 Spoilage</button>
         </div>
     </div>
 
     <script>
-        const SUPABASE_URL = "https://supabase.co";
-        const SUPABASE_KEY = "sb_publishable_q08Iv5vIYTIhvs-IwSQcNg_6xXwF"; 
-        
-        // Wait specifically for Supabase to be completely available before executing the connection hook
-        let _supabase;
-        try {
-            _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        } catch (e) {
-            console.error("Supabase load fallback triggered");
-        }
-
+        // Dedicated Secure Business Calculations Array Registry
         let localInventory = [
             { name: 'Bananas', quantity: 50, unit: 'bunches', cost_price: 150, selling_price: 200 },
             { name: 'Mangoes', quantity: 80, unit: 'pieces', cost_price: 30, selling_price: 50 },
@@ -120,29 +110,11 @@
             if (enteredPIN === "3456") {
                 document.getElementById('login-overlay').style.display = 'none';
                 document.getElementById('main-app').style.display = 'flex';
-                initApp();
+                renderApp();
             } else {
-                alert("Incorrect PIN.");
+                alert("Incorrect Security PIN. Access Denied.");
                 document.getElementById('pin-field').value = '';
             }
-        }
-
-        async function initApp() {
-            if (_supabase) {
-                try {
-                    const { data } = await _supabase.from('inventory').select('*');
-                    if (data && data.length > 0) localInventory = data;
-                    
-                    const { data: salesData } = await _supabase.from('sales').select('amount');
-                    const { data: expData } = await _supabase.from('expenses').select('amount');
-                    
-                    totalSales = (salesData || []).reduce((acc, curr) => acc + Number(curr.amount), 0);
-                    totalExpenses = (expData || []).reduce((acc, curr) => acc + Number(curr.amount), 0);
-                } catch(err) {
-                    console.log("Running in offline fallback mode smoothly");
-                }
-            }
-            renderApp();
         }
 
         function renderApp() {
@@ -172,7 +144,7 @@
             document.getElementById('metric-profit').innerText = `KES ${(totalSales - totalExpenses).toLocaleString()}`;
         }
 
-        async function sellItem(name, price) {
+        function sellItem(name, price) {
             localInventory = localInventory.map(item => {
                 if (item.name === name && item.quantity > 0) {
                     return { ...item, quantity: item.quantity - 1 };
@@ -181,5 +153,12 @@
             });
             totalSales += price;
             renderApp();
+        }
 
-            if (_supabase) {
+        function logExpense(amount) {
+            totalExpenses += amount;
+            renderApp();
+        }
+    </script>
+</body>
+</html>
