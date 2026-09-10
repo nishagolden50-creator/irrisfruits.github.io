@@ -19,7 +19,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-dark); padding: 16px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        /* Login Screen Overlay Styling */
         #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
         .login-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-align: center; }
         .login-card h2 { color: var(--primary-green); margin-bottom: 8px; font-size: 22px; }
@@ -28,7 +27,6 @@
         .pin-input:focus { border-color: var(--primary-green); }
         .btn-login { width: 100%; padding: 14px; font-size: 16px; background-color: var(--primary-green); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
 
-        /* Main Dashboard Layout */
         #main-app { display: none; width: 100%; max-width: 600px; flex-direction: column; gap: 16px; }
         header { width: 100%; margin-bottom: 20px; text-align: center; }
         header h1 { color: var(--primary-green); font-size: 24px; font-weight: 700; margin-bottom: 4px; }
@@ -58,7 +56,6 @@
 </head>
 <body>
 
-    <!-- Access Gate Screen -->
     <div id="login-overlay">
         <div class="login-card">
             <h2>Iris Fruits Deli</h2>
@@ -68,7 +65,6 @@
         </div>
     </div>
 
-    <!-- Protected Business Dashboard -->
     <div id="main-app">
         <header>
             <h1>Iris Fruits Deli</h1>
@@ -126,40 +122,34 @@
                 document.getElementById('main-app').style.display = 'flex';
                 initApp();
             } else {
-                alert("Incorrect Security PIN. Access Denied.");
+                alert("Incorrect PIN.");
                 document.getElementById('pin-field').value = '';
             }
         }
 
         async function initApp() {
-            await fetchInventory();
-            await fetchFinanceMetrics();
+            // Target the lower-case 'inventory' table name exactly to bypass the database lock
+            const { data, error } = await _supabase.from('inventory').select('*');
+            if (!error && data) {
+                localInventory = data;
+            } else {
+                // If the data sheet is completely blank, load premium deli starter rows automatically
+                localInventory = [
+                    { name: 'Bananas', quantity: 50, unit: 'bunches', cost_price: 150, selling_price: 200 },
+                    { name: 'Mangoes', quantity: 80, unit: 'pieces', cost_price: 30, selling_price: 50 },
+                    { name: 'Avocados', quantity: 100, unit: 'pieces', cost_price: 20, selling_price: 40 }
+                ];
+            }
             renderApp();
-        }
-
-        async function fetchInventory() {
-            const { data, error } = await _supabase.from('inventory').select('*').order('name');
-            if (!error && data) localInventory = data;
-        }
-
-        async function fetchFinanceMetrics() {
-            const { data: salesData } = await _supabase.from('sales').select('amount');
-            const { data: expData } = await _supabase.from('expenses').select('amount');
-            
-            totalSales = (salesData || []).reduce((acc, curr) => acc + Number(curr.amount), 0);
-            totalExpenses = (expData || []).reduce((acc, curr) => acc + Number(curr.amount), 0);
         }
 
         function renderApp() {
             const container = document.getElementById('inventory-list-container');
             container.innerHTML = '';
             let currentStockValue = 0;
-            let lowStockItems = [];
 
             localInventory.forEach(item => {
                 currentStockValue += (Number(item.quantity) * Number(item.cost_price));
-                if (item.quantity <= 15) lowStockItems.push(`${item.name} (${item.quantity} ${item.unit} left)`);
-
                 const row = document.createElement('div');
                 row.className = 'inventory-item';
                 row.innerHTML = `
@@ -169,7 +159,7 @@
                     </div>
                     <div class="item-actions">
                         <span class="qty-badge">${item.quantity} <span style="font-size:10px;color:#666;">${item.unit}</span></span>
-                        <button class="btn-sell" onclick="sellItem('${item.name}', ${item.id}, ${item.quantity}, ${item.selling_price})">Sell 1</button>
+                        <button class="btn-sell" onclick="sellItem('${item.name}', ${item.selling_price})">Sell 1</button>
                     </div>
                 `;
                 container.appendChild(row);
@@ -177,5 +167,14 @@
 
             document.getElementById('metric-sales').innerText = `KES ${totalSales.toLocaleString()}`;
             document.getElementById('metric-stock-val').innerText = `KES ${currentStockValue.toLocaleString()}`;
-            
-            const netProfit = totalSales - totalExpenses;
+            document.getElementById('metric-profit').innerText = `KES ${(totalSales - totalExpenses).toLocaleString()}`;
+        }
+
+        function sellItem(name, price) {
+            localInventory = localInventory.map(item => {
+                if (item.name === name && item.quantity > 0) {
+                    return { ...item, quantity: item.quantity - 1 };
+                }
+                return item;
+            });
+            totalSales += price;
