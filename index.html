@@ -1,1426 +1,181 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#f7f6f0">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-
-  <title>Iris Fruits — Inventory & Sales</title>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-    :root {
-      --bg: #f7f6f0;
-      --card: #fffefa;
-      --ink: #17211b;
-      --muted: #6d756f;
-      --line: #e6e3d9;
-      --green: #176b43;
-      --green2: #e8f4ec;
-      --red: #b43c35;
-      --red2: #fff0ed;
-      --amber: #9b6400;
-      --amber2: #fff4d6;
-      --shadow: 0 12px 34px rgba(26, 40, 31, 0.07);
-      --radius: 22px;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      background: var(--bg);
-    }
-
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--ink);
-      font: 15px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text",
-        Inter, system-ui, sans-serif;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    button,
-    input,
-    select {
-      font: inherit;
-    }
-
-    button {
-      touch-action: manipulation;
-    }
-
-    .app {
-      width: min(100%, 760px);
-      margin: auto;
-      padding:
-        calc(18px + env(safe-area-inset-top))
-        16px
-        calc(100px + env(safe-area-inset-bottom));
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 2px 2px 22px;
-    }
-
-    .eyebrow {
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      font-size: 27px;
-      line-height: 1.1;
-      margin: 4px 0 0;
-      letter-spacing: -0.04em;
-    }
-
-    .sync {
-      display: flex;
-      gap: 7px;
-      align-items: center;
-      font-size: 12px;
-      color: var(--muted);
-      background: rgba(255, 255, 255, 0.65);
-      padding: 8px 11px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-    }
-
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #d59b22;
-    }
-
-    .dot.online {
-      background: #27a35b;
-      box-shadow: 0 0 0 4px rgba(39, 163, 91, 0.12);
-    }
-
-    .dot.error {
-      background: var(--red);
-    }
-
-    .metrics {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 18px;
-    }
-
-    .metric {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 15px;
-      box-shadow: var(--shadow);
-    }
-
-    .metric.primary {
-      grid-column: 1/-1;
-      background: linear-gradient(145deg, #153f2d, #1c7248);
-      color: white;
-      border: 0;
-    }
-
-    .metric-label {
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 650;
-    }
-
-    .primary .metric-label {
-      color: #cce3d5;
-    }
-
-    .metric-value {
-      font-size: 22px;
-      font-weight: 780;
-      letter-spacing: -0.04em;
-      margin-top: 5px;
-    }
-
-    .primary .metric-value {
-      font-size: 32px;
-    }
-
-    .split {
-      display: flex;
-      gap: 18px;
-      margin-top: 12px;
-      font-size: 12px;
-      color: #d8e9df;
-    }
-
-    .split strong {
-      display: block;
-      color: white;
-      font-size: 14px;
-      margin-top: 2px;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 16px;
-      box-shadow: var(--shadow);
-      margin: 12px 0;
-    }
-
-    .section-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-
-    .section-head h2 {
-      font-size: 18px;
-      margin: 0;
-      letter-spacing: -0.025em;
-    }
-
-    .section-head p {
-      font-size: 12px;
-      color: var(--muted);
-      margin: 3px 0 0;
-    }
-
-    .badge {
-      font-size: 11px;
-      padding: 5px 9px;
-      border-radius: 999px;
-      background: var(--green2);
-      color: var(--green);
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .badge.warn {
-      background: var(--amber2);
-      color: var(--amber);
-    }
-
-    .entry {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 9px;
-    }
-
-    .field {
-      position: relative;
-    }
-
-    .field label {
-      display: block;
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 700;
-      margin: 0 0 5px 3px;
-    }
-
-    .field input,
-    .field select {
-      width: 100%;
-      min-height: 48px;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: #fff;
-      padding: 0 12px;
-      color: var(--ink);
-      outline: none;
-      font-size: 16px;
-    }
-
-    .field input:focus,
-    .field select:focus {
-      border-color: #70a789;
-      box-shadow: 0 0 0 3px rgba(23, 107, 67, 0.1);
-    }
-
-    .field.wide {
-      grid-column: 1/-1;
-    }
-
-    .btn {
-      border: 0;
-      border-radius: 14px;
-      min-height: 48px;
-      padding: 0 15px;
-      background: var(--green);
-      color: white;
-      font-weight: 750;
-      cursor: pointer;
-      transition: transform 0.12s, opacity 0.12s;
-    }
-
-    .btn:active {
-      transform: scale(0.975);
-    }
-
-    .btn:disabled {
-      opacity: 0.45;
-    }
-
-    .entry .btn {
-      grid-column: 1/-1;
-    }
-
-    .quick {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 9px;
-    }
-
-    .quick .btn {
-      background: #f1efe7;
-      color: var(--ink);
-      border: 1px solid var(--line);
-      font-size: 13px;
-    }
-
-    .quick .btn.danger {
-      color: var(--red);
-      background: var(--red2);
-      border-color: #f3d7d2;
-    }
-
-    .stock-list {
-      display: grid;
-      gap: 9px;
-    }
-
-    .stock-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: center;
-      gap: 12px;
-      padding: 13px;
-      border-radius: 17px;
-      background: #faf9f4;
-      border: 1px solid #ebe8de;
-    }
-
-    .fruit {
-      display: flex;
-      gap: 11px;
-      min-width: 0;
-      align-items: center;
-    }
-
-    .emoji {
-      display: grid;
-      place-items: center;
-      width: 40px;
-      height: 40px;
-      border-radius: 13px;
-      background: white;
-      font-size: 22px;
-      border: 1px solid var(--line);
-    }
-
-    .fruit-name {
-      font-weight: 760;
-    }
-
-    .fruit-meta {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    .controls {
-      display: flex;
-      gap: 6px;
-    }
-
-    .mini {
-      height: 38px;
-      border-radius: 12px;
-      border: 1px solid var(--line);
-      background: white;
-      color: var(--ink);
-      font-weight: 750;
-      padding: 0 11px;
-      cursor: pointer;
-    }
-
-    .mini.sell {
-      background: var(--green);
-      border-color: var(--green);
-      color: white;
-    }
-
-    .mini:disabled {
-      opacity: 0.35;
-    }
-
-    .attention {
-      border-color: #eed6a2;
-      background: #fffdf5;
-    }
-
-    .attention .stock-row {
-      background: #fff8e8;
-      border-color: #f1deb3;
-    }
-
-    .activity {
-      display: grid;
-      gap: 7px;
-    }
-
-    .activity-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 10px 3px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .activity-row:last-child {
-      border: 0;
-    }
-
-    .activity-title {
-      font-weight: 650;
-    }
-
-    .activity-meta {
-      font-size: 11px;
-      color: var(--muted);
-    }
-
-    .amount {
-      font-weight: 760;
-      white-space: nowrap;
-    }
-
-    .amount.negative {
-      color: var(--red);
-    }
-
-    .empty {
-      text-align: center;
-      color: var(--muted);
-      padding: 20px 4px;
-    }
-
-    .toast {
-      position: fixed;
-      left: 50%;
-      bottom: calc(22px + env(safe-area-inset-bottom));
-      transform: translate(-50%, 30px);
-      opacity: 0;
-      background: #17211b;
-      color: white;
-      border-radius: 14px;
-      padding: 11px 15px;
-      font-size: 13px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
-      transition: 0.25s;
-      z-index: 9;
-      max-width: calc(100% - 32px);
-      text-align: center;
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translate(-50%, 0);
-    }
-
-    .toast.bad {
-      background: #8d2d28;
-    }
-
-    .config {
-      font-size: 12px;
-      color: var(--muted);
-      text-align: center;
-      margin: 20px 4px;
-    }
-
-    .config code {
-      background: #ece9df;
-      padding: 2px 5px;
-      border-radius: 5px;
-    }
-
-    @media (min-width: 650px) {
-      .metrics {
-        grid-template-columns: 2fr 1fr 1fr;
-      }
-
-      .metric.primary {
-        grid-column: auto;
-      }
-
-      .app {
-        padding-left: 24px;
-        padding-right: 24px;
-      }
-
-      .stock-list {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iris Fruits Deli - Inventory System</title>
+    <!-- Supabase CDN Link -->
+    <script src="https://jsdelivr.net"></script>
+    <style>
+        :root {
+            --bg-color: #f7f6f0;
+            --primary-green: #2d5a27;
+            --accent-green: #4caf50;
+            --text-dark: #2c2c2c;
+            --card-bg: #ffffff;
+            --border-color: #e5e4de;
+            --attention-color: #d32f2f;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-dark); padding: 16px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        
+        /* Login Screen Overlay Styling */
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
+        .login-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-align: center; }
+        .login-card h2 { color: var(--primary-green); margin-bottom: 8px; font-size: 22px; }
+        .login-card p { font-size: 13px; color: #666; margin-bottom: 20px; }
+        .pin-input { width: 100%; padding: 14px; font-size: 20px; text-align: center; letter-spacing: 8px; border: 2px solid var(--border-color); border-radius: 10px; margin-bottom: 16px; font-weight: 700; outline: none; }
+        .pin-input:focus { border-color: var(--primary-green); }
+        .btn-login { width: 100%; padding: 14px; font-size: 16px; background-color: var(--primary-green); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+
+        /* Main Dashboard Layout */
+        #main-app { display: none; width: 100%; max-width: 600px; flex-direction: column; gap: 16px; }
+        header { width: 100%; margin-bottom: 20px; text-align: center; }
+        header h1 { color: var(--primary-green); font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .metric-title { font-size: 12px; text-transform: uppercase; color: #777; margin-bottom: 6px; font-weight: 600; }
+        .metric-value { font-size: 20px; font-weight: 700; color: var(--text-dark); }
+        .inventory-list { display: flex; flex-direction: column; gap: 10px; }
+        .inventory-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; }
+        .item-info h3 { font-size: 16px; margin-bottom: 2px; }
+        .item-info p { font-size: 12px; color: #666; }
+        .item-actions { display: flex; align-items: center; gap: 12px; }
+        .qty-badge { font-weight: 700; font-size: 16px; min-width: 40px; text-align: center; }
+        button { background-color: var(--primary-green); color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        button:active { opacity: 0.8; }
+        .btn-sell { background-color: var(--accent-green); }
+        .attention-card { border: 2px solid var(--attention-color); background-color: #fff8f8; display: none; }
+        .attention-card h4 { color: var(--attention-color); margin-bottom: 6px; }
+        .attention-list { font-size: 13px; font-weight: 600; list-style-type: square; padding-left: 18px; }
+        .pipeline-section { display: flex; gap: 10px; }
+        .pipeline-section button { flex: 1; font-size: 13px; padding: 12px; }
+        .btn-expense { background-color: #795548; }
+        .btn-spoilage { background-color: #607d8b; }
+        .status-badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 700; margin-top: 4px; }
+        .status-live { background-color: #e8f5e9; color: #2e7d32; }
+    </style>
 </head>
-
 <body>
-  <main class="app">
-    <header>
-      <div>
-        <div class="eyebrow">Iris Fruits Deli</div>
-        <h1>Business overview</h1>
-      </div>
 
-      <div class="sync">
-        <span class="dot" id="dot"></span>
-        <span id="syncText">Local mode</span>
-      </div>
-    </header>
-
-    <section class="metrics" aria-label="Business metrics">
-      <article class="metric primary">
-        <div class="metric-label">Today's sales</div>
-        <div class="metric-value" id="sales">KES 0.00</div>
-
-        <div class="split">
-          <span>
-            Cash
-            <strong id="cash">KES 0.00</strong>
-          </span>
-
-          <span>
-            M-PESA
-            <strong id="mpesa">KES 0.00</strong>
-          </span>
+    <!-- Access Gate Screen -->
+    <div id="login-overlay">
+        <div class="login-card">
+            <h2>Iris Fruits Deli</h2>
+            <p>Enter Management Access PIN</p>
+            <input type="password" id="pin-field" class="pin-input" maxlength="4" placeholder="••••" inputmode="numeric">
+            <button class="btn-login" onclick="verifyAccessPIN()">Unlock System</button>
         </div>
-      </article>
-
-      <article class="metric">
-        <div class="metric-label">Net profit</div>
-        <div class="metric-value" id="profit">KES 0.00</div>
-      </article>
-
-      <article class="metric">
-        <div class="metric-label">Profit margin</div>
-        <div class="metric-value" id="margin">0.00%</div>
-      </article>
-
-      <article class="metric">
-        <div class="metric-label">Stock value</div>
-        <div class="metric-value" id="stockValue">KES 0.00</div>
-      </article>
-    </section>
-
-    <section class="card">
-      <div class="section-head">
-        <div>
-          <h2>Record a sale</h2>
-          <p>Cash and M-PESA tracked separately</p>
-        </div>
-
-        <span class="badge">Live totals</span>
-      </div>
-
-      <form class="entry" id="saleForm">
-        <div class="field wide">
-          <label for="saleAmount">AMOUNT (KES)</label>
-
-          <input
-            id="saleAmount"
-            inputmode="decimal"
-            type="number"
-            min="1"
-            step="0.01"
-            placeholder="e.g. 750"
-            required
-          >
-        </div>
-
-        <div class="field wide">
-          <label for="payment">PAYMENT METHOD</label>
-
-          <select id="payment">
-            <option value="cash">Cash</option>
-            <option value="mpesa">M-PESA</option>
-          </select>
-        </div>
-
-        <button class="btn" type="submit">Add sale</button>
-      </form>
-    </section>
-
-    <section class="card attention" id="attentionCard" hidden>
-      <div class="section-head">
-        <div>
-          <h2>Attention: Low stock</h2>
-          <p>Restock these items soon</p>
-        </div>
-
-        <span class="badge warn" id="lowCount">0 items</span>
-      </div>
-
-      <div class="stock-list" id="lowList"></div>
-    </section>
-
-    <section class="card">
-      <div class="section-head">
-        <div>
-          <h2>Current inventory</h2>
-          <p>Use + to restock and − Sell for one unit</p>
-        </div>
-
-        <span class="badge" id="stockCount">0 items</span>
-      </div>
-
-      <div class="stock-list" id="stockList"></div>
-    </section>
-
-    <section class="card">
-      <div class="section-head">
-        <div>
-          <h2>Quick expenses</h2>
-          <p>Immediately reduces today's net profit</p>
-        </div>
-      </div>
-
-      <div class="quick">
-        <button
-          class="btn"
-          data-expense="500"
-          data-note="Transport, packing & fees"
-        >
-          + KES 500 expense
-        </button>
-
-        <button
-          class="btn danger"
-          data-expense="100"
-          data-note="Fruit spoilage"
-        >
-          + KES 100 spoilage
-        </button>
-      </div>
-    </section>
-
-    <section class="card">
-      <div class="section-head">
-        <div>
-          <h2>Recent activity</h2>
-          <p>Latest sales and expenses</p>
-        </div>
-      </div>
-
-      <div class="activity" id="activity"></div>
-    </section>
-
-    <p class="config" id="configNote">
-      Connect Supabase by replacing
-      <code>YOUR_SUPABASE_URL</code> and
-      <code>YOUR_SUPABASE_ANON_KEY</code>
-      in this file.
-    </p>
-  </main>
-
-  <div class="toast" id="toast" role="status"></div>
-
-  <script>
-    /*
-      SUPABASE CONNECTION
-
-      Replace only the two values below.
-
-      Use your Supabase anon/public key.
-      Never use the service_role key here.
-    */
-
-    const SUPABASE_URL = "YOUR_SUPABASE_URL";
-    const SUPABASE_KEY = "YOUR_SUPABASE_ANON_KEY";
-
-    const PRODUCTS = [
-      {
-        id: "banana",
-        name: "Bananas",
-        emoji: "🍌",
-        unit: "bunches",
-        quantity: 18,
-        cost_price: 120,
-        low_threshold: 5
-      },
-      {
-        id: "avocado",
-        name: "Avocados",
-        emoji: "🥑",
-        unit: "pieces",
-        quantity: 30,
-        cost_price: 25,
-        low_threshold: 10
-      },
-      {
-        id: "mango",
-        name: "Mangoes",
-        emoji: "🥭",
-        unit: "pieces",
-        quantity: 24,
-        cost_price: 35,
-        low_threshold: 8
-      },
-      {
-        id: "orange",
-        name: "Oranges",
-        emoji: "🍊",
-        unit: "kg",
-        quantity: 15,
-        cost_price: 140,
-        low_threshold: 5
-      },
-      {
-        id: "watermelon",
-        name: "Watermelons",
-        emoji: "🍉",
-        unit: "whole",
-        quantity: 8,
-        cost_price: 250,
-        low_threshold: 3
-      },
-      {
-        id: "pineapple",
-        name: "Pineapples",
-        emoji: "🍍",
-        unit: "whole",
-        quantity: 10,
-        cost_price: 130,
-        low_threshold: 3
-      }
-    ];
-
-    const configured =
-      SUPABASE_URL.startsWith("https://") &&
-      !SUPABASE_URL.includes("YOUR_") &&
-      !SUPABASE_KEY.includes("YOUR_");
-
-    const db = configured
-      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-      : null;
-
-    const state = {
-      inventory: [],
-      transactions: [],
-      busy: new Set()
-    };
-
-    const $ = (selector) => document.querySelector(selector);
-
-    const money = (number) =>
-      new Intl.NumberFormat("en-KE", {
-        style: "currency",
-        currency: "KES",
-        minimumFractionDigits: 2
-      }).format(Number(number) || 0);
-
-    const today = () =>
-      new Date().toLocaleDateString("en-CA", {
-        timeZone: "Africa/Nairobi"
-      });
-
-    function toast(message, bad = false) {
-      const element = $("#toast");
-
-      element.textContent = message;
-      element.className = "toast show" + (bad ? " bad" : "");
-
-      clearTimeout(toast.timer);
-
-      toast.timer = setTimeout(() => {
-        element.className = "toast";
-      }, 2400);
-    }
-
-    function setSync(kind, text) {
-      $("#dot").className = "dot " + kind;
-      $("#syncText").textContent = text;
-    }
-
-    function localLoad() {
-      state.inventory =
-        JSON.parse(localStorage.getItem("fruit_inventory") || "null") ||
-        PRODUCTS;
-
-      state.transactions =
-        JSON.parse(localStorage.getItem("fruit_transactions") || "[]");
-    }
-
-    function localSave() {
-      localStorage.setItem(
-        "fruit_inventory",
-        JSON.stringify(state.inventory)
-      );
-
-      localStorage.setItem(
-        "fruit_transactions",
-        JSON.stringify(state.transactions)
-      );
-    }
-
-    async function bootstrap() {
-      if (!configured) {
-        localLoad();
-        setSync("", "Local demo");
-        render();
-        return;
-      }
-
-      try {
-        setSync("", "Connecting…");
-
-        const [
-          { data: inventoryData, error: inventoryError },
-          { data: transactionData, error: transactionError }
-        ] = await Promise.all([
-          db.from("inventory").select("*").order("name"),
-
-          db
-            .from("transactions")
-            .select("*")
-            .order("created_at", { ascending: false })
-            .limit(100)
-        ]);
-
-        if (inventoryError || transactionError) {
-          throw inventoryError || transactionError;
-        }
-
-        if (!inventoryData.length) {
-          const { data, error } = await db
-            .from("inventory")
-            .insert(PRODUCTS)
-            .select();
-
-          if (error) {
-            throw error;
-          }
-
-          state.inventory = data;
-        } else {
-          state.inventory = inventoryData;
-        }
-
-        state.transactions = transactionData;
-
-        setSync("online", "Cloud synced");
-        $("#configNote").hidden = true;
-
-        render();
-        subscribe();
-      } catch (error) {
-        console.error(error);
-
-        localLoad();
-        setSync("error", "Cloud error");
-        render();
-
-        toast(
-          "Supabase setup needed — using this phone only",
-          true
-        );
-      }
-    }
-
-    function dayTransactions() {
-      return state.transactions.filter((transaction) => {
-        return String(transaction.business_date || "").slice(0, 10) === today();
-      });
-    }
-
-    function render() {
-      const transactions = dayTransactions();
-
-      const sales = transactions
-        .filter((transaction) => transaction.type === "sale")
-        .reduce(
-          (total, transaction) => total + Number(transaction.amount),
-          0
-        );
-
-      const expenses = transactions
-        .filter((transaction) => transaction.type === "expense")
-        .reduce(
-          (total, transaction) => total + Number(transaction.amount),
-          0
-        );
-
-      const cash = transactions
-        .filter(
-          (transaction) =>
-            transaction.type === "sale" &&
-            transaction.payment_method === "cash"
-        )
-        .reduce(
-          (total, transaction) => total + Number(transaction.amount),
-          0
-        );
-
-      const mpesa = sales - cash;
-      const profit = sales - expenses;
-
-      $("#sales").textContent = money(sales);
-      $("#cash").textContent = money(cash);
-      $("#mpesa").textContent = money(mpesa);
-      $("#profit").textContent = money(profit);
-
-      $("#margin").textContent =
-        (sales ? (profit / sales) * 100 : 0).toFixed(2) + "%";
-
-      $("#stockValue").textContent = money(
-        state.inventory.reduce((total, product) => {
-          return (
-            total +
-            Number(product.quantity) *
-              Number(product.cost_price)
-          );
-        }, 0)
-      );
-
-      const lowStock = state.inventory.filter((product) => {
-        return (
-          Number(product.quantity) <
-          Number(product.low_threshold)
-        );
-      });
-
-      const normalStock = state.inventory.filter((product) => {
-        return (
-          Number(product.quantity) >=
-          Number(product.low_threshold)
-        );
-      });
-
-      $("#attentionCard").hidden = !lowStock.length;
-
-      $("#lowCount").textContent =
-        `${lowStock.length} item${lowStock.length === 1 ? "" : "s"}`;
-
-      $("#stockCount").textContent =
-        `${state.inventory.length} items`;
-
-      $("#lowList").innerHTML = lowStock
-        .map(stockRow)
-        .join("");
-
-      $("#stockList").innerHTML = normalStock
-        .map(stockRow)
-        .join("");
-
-      $("#activity").innerHTML =
-        state.transactions
-          .slice(0, 8)
-          .map((transaction) => {
-            const paymentLabel =
-              transaction.type === "sale"
-                ? String(transaction.payment_method).toUpperCase()
-                : "EXPENSE";
-
-            const negativeClass =
-              transaction.type === "expense"
-                ? "negative"
-                : "";
-
-            const sign =
-              transaction.type === "expense"
-                ? "−"
-                : "+";
-
-            return `
-              <div class="activity-row">
-                <div>
-                  <div class="activity-title">
-                    ${escapeHtml(
-                      transaction.note ||
-                      title(transaction.type)
-                    )}
-                  </div>
-
-                  <div class="activity-meta">
-                    ${paymentLabel} ·
-                    ${new Date(transaction.created_at).toLocaleString(
-                      "en-KE",
-                      {
-                        dateStyle: "medium",
-                        timeStyle: "short"
-                      }
-                    )}
-                  </div>
-                </div>
-
-                <div class="amount ${negativeClass}">
-                  ${sign}${money(transaction.amount)}
-                </div>
-              </div>
-            `;
-          })
-          .join("") ||
-        '<div class="empty">No activity yet today.</div>';
-    }
-
-    function title(text) {
-      return text.charAt(0).toUpperCase() + text.slice(1);
-    }
-
-    function escapeHtml(text) {
-      return String(text).replace(
-        /[&<>'"]/g,
-        (character) =>
-          ({
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            "'": "&#39;",
-            '"': "&quot;"
-          })[character]
-      );
-    }
-
-    function stockRow(product) {
-      const busy = state.busy.has(product.id);
-
-      return `
-        <div class="stock-row">
-          <div class="fruit">
-            <span class="emoji">${product.emoji}</span>
-
-            <div>
-              <div class="fruit-name">
-                ${escapeHtml(product.name)}
-              </div>
-
-              <div class="fruit-meta">
-                ${Number(product.quantity)}
-                ${escapeHtml(product.unit)}
-                · ${money(product.cost_price)} each
-              </div>
+    </div>
+
+    <!-- Protected Business Dashboard -->
+    <div id="main-app">
+        <header>
+            <h1>Iris Fruits Deli</h1>
+            <p style="font-size: 13px; color: #666;">Cloud Management System <span class="status-badge status-live">● Live Cloud</span></p>
+        </header>
+
+        <div class="metrics-grid">
+            <div class="card">
+                <div class="metric-title">Today's Sales</div>
+                <div id="metric-sales" class="metric-value">KES 0</div>
             </div>
-          </div>
-
-          <div class="controls">
-            <button
-              class="mini"
-              data-stock="${product.id}"
-              data-delta="1"
-              ${busy ? "disabled" : ""}
-              aria-label="Add one ${escapeHtml(product.name)}"
-            >
-              +
-            </button>
-
-            <button
-              class="mini sell"
-              data-stock="${product.id}"
-              data-delta="-1"
-              ${
-                busy || Number(product.quantity) <= 0
-                  ? "disabled"
-                  : ""
-              }
-            >
-              − Sell
-            </button>
-          </div>
+            <div class="card">
+                <div class="metric-title">Net Profit</div>
+                <div id="metric-profit" class="metric-value">KES 0</div>
+            </div>
+            <div class="card">
+                <div class="metric-title">Profit Margin</div>
+                <div id="metric-margin" class="metric-value">0%</div>
+            </div>
+            <div class="card">
+                <div class="metric-title">Current Stock Value</div>
+                <div id="metric-stock-val" class="metric-value">KES 0</div>
+            </div>
         </div>
-      `;
-    }
 
-    async function changeStock(id, delta) {
-      const product = state.inventory.find(
-        (item) => item.id === id
-      );
+        <div id="attention-box" class="card attention-card">
+            <h4>⚠️ ATTENTION: Low Stock Items</h4>
+            <ul id="attention-list" class="attention-list"></ul>
+        </div>
 
-      if (
-        !product ||
-        state.busy.has(id) ||
-        Number(product.quantity) + delta < 0
-      ) {
-        return;
-      }
+        <div class="card">
+            <h3 style="margin-bottom: 12px; color: var(--primary-green);">Live Stock & Sales Registry</h3>
+            <div id="inventory-list-container" class="inventory-list"></div>
+        </div>
 
-      const oldQuantity = Number(product.quantity);
+        <div class="pipeline-section">
+            <button class="btn-expense" onclick="logExpense(500, 'Transport & Packing')">➕ Add KES 500 Transport</button>
+            <button class="btn-spoilage" onclick="logExpense(100, 'Fruit Spoilage')">⚠️ Add KES 100 Spoilage</button>
+        </div>
+    </div>
 
-      product.quantity = oldQuantity + delta;
-      state.busy.add(id);
+    <script>
+        const SUPABASE_URL = "https://supabase.co";
+        const SUPABASE_KEY = "sb_publishable_q08Iv5vIYTIhvs-IwSQcNg_6xXwF"; 
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-      render();
+        let localInventory = [];
+        let totalSales = 0;
+        let totalExpenses = 0;
 
-      try {
-        if (db) {
-          const { error } = await db
-            .from("inventory")
-            .update({
-              quantity: product.quantity,
-              updated_at: new Date().toISOString()
-            })
-            .eq("id", id);
-
-          if (error) {
-            throw error;
-          }
-        } else {
-          localSave();
-        }
-
-        toast(
-          delta > 0
-            ? `${product.name} restocked`
-            : `${product.name}: 1 ${product.unit} sold from stock`
-        );
-      } catch (error) {
-        console.error(error);
-
-        product.quantity = oldQuantity;
-
-        toast(
-          "Could not save stock change",
-          true
-        );
-      } finally {
-        state.busy.delete(id);
-        render();
-      }
-    }
-
-    async function addTransaction(
-      type,
-      amount,
-      paymentMethod,
-      note
-    ) {
-      const transaction = {
-        type,
-        amount: Number(amount),
-        payment_method: paymentMethod || null,
-        note,
-        business_date: today()
-      };
-
-      try {
-        if (db) {
-          const { data, error } = await db
-            .from("transactions")
-            .insert(transaction)
-            .select()
-            .single();
-
-          if (error) {
-            throw error;
-          }
-
-          state.transactions.unshift(data);
-        } else {
-          state.transactions.unshift({
-            ...transaction,
-            id: crypto.randomUUID(),
-            created_at: new Date().toISOString()
-          });
-
-          localSave();
-        }
-
-        render();
-
-        toast(
-          type === "sale"
-            ? "Sale recorded"
-            : "Expense recorded"
-        );
-      } catch (error) {
-        console.error(error);
-
-        toast(
-          "Could not save. Please try again.",
-          true
-        );
-      }
-    }
-
-    function subscribe() {
-      db.channel("fruit-live")
-        .on(
-          "postgres_changes",
-          {
-            event: "*",
-            schema: "public",
-            table: "inventory"
-          },
-          (payload) => {
-            const product = payload.new;
-
-            if (!product) {
-              return;
-            }
-
-            const productIndex = state.inventory.findIndex(
-              (item) => item.id === product.id
-            );
-
-            if (productIndex < 0) {
-              state.inventory.push(product);
+        function verifyAccessPIN() {
+            const enteredPIN = document.getElementById('pin-field').value;
+            if (enteredPIN === "3456") {
+                document.getElementById('login-overlay').style.display = 'none';
+                document.getElementById('main-app').style.display = 'flex';
+                initApp();
             } else {
-              state.inventory[productIndex] = product;
+                alert("Incorrect Security PIN. Access Denied.");
+                document.getElementById('pin-field').value = '';
             }
-
-            render();
-          }
-        )
-        .on(
-          "postgres_changes",
-          {
-            event: "INSERT",
-            schema: "public",
-            table: "transactions"
-          },
-          (payload) => {
-            const alreadyExists = state.transactions.some(
-              (transaction) =>
-                transaction.id === payload.new.id
-            );
-
-            if (!alreadyExists) {
-              state.transactions.unshift(payload.new);
-              render();
-            }
-          }
-        )
-        .subscribe((status) => {
-          if (status === "SUBSCRIBED") {
-            setSync("online", "Live sync");
-          }
-        });
-    }
-
-    document.addEventListener("click", (event) => {
-      const stockButton =
-        event.target.closest("[data-stock]");
-
-      if (stockButton) {
-        changeStock(
-          stockButton.dataset.stock,
-          Number(stockButton.dataset.delta)
-        );
-      }
-
-      const expenseButton =
-        event.target.closest("[data-expense]");
-
-      if (expenseButton) {
-        addTransaction(
-          "expense",
-          expenseButton.dataset.expense,
-          null,
-          expenseButton.dataset.note
-        );
-      }
-    });
-
-    $("#saleForm").addEventListener(
-      "submit",
-      async (event) => {
-        event.preventDefault();
-
-        const amount = Number(
-          $("#saleAmount").value
-        );
-
-        if (!(amount > 0)) {
-          toast(
-            "Enter a valid amount",
-            true
-          );
-
-          return;
         }
 
-        const button = event.submitter;
-
-        button.disabled = true;
-
-        const paymentMethod =
-          $("#payment").value;
-
-        await addTransaction(
-          "sale",
-          amount,
-          paymentMethod,
-          paymentMethod === "mpesa"
-            ? "M-PESA sale"
-            : "Cash sale"
-        );
-
-        event.target.reset();
-        button.disabled = false;
-      }
-    );
-
-    window.addEventListener(
-      "online",
-      () => {
-        if (configured) {
-          setSync("online", "Online");
+        async function initApp() {
+            await fetchInventory();
+            await fetchFinanceMetrics();
+            renderApp();
         }
-      }
-    );
 
-    window.addEventListener(
-      "offline",
-      () => {
-        setSync("error", "Offline");
-      }
-    );
+        async function fetchInventory() {
+            const { data, error } = await _supabase.from('inventory').select('*').order('name');
+            if (!error && data) localInventory = data;
+        }
 
-    bootstrap();
-  </script>
+        async function fetchFinanceMetrics() {
+            const { data: salesData } = await _supabase.from('sales').select('amount');
+            const { data: expData } = await _supabase.from('expenses').select('amount');
+            
+            totalSales = (salesData || []).reduce((acc, curr) => acc + Number(curr.amount), 0);
+            totalExpenses = (expData || []).reduce((acc, curr) => acc + Number(curr.amount), 0);
+        }
 
-  <!--
-  ==========================================================
-  SUPABASE DATABASE SETUP
-  ==========================================================
+        function renderApp() {
+            const container = document.getElementById('inventory-list-container');
+            container.innerHTML = '';
+            let currentStockValue = 0;
+            let lowStockItems = [];
 
-  Open your Supabase project.
+            localInventory.forEach(item => {
+                currentStockValue += (Number(item.quantity) * Number(item.cost_price));
+                if (item.quantity <= 15) lowStockItems.push(`${item.name} (${item.quantity} ${item.unit} left)`);
 
-  Go to:
-  SQL Editor > New query
+                const row = document.createElement('div');
+                row.className = 'inventory-item';
+                row.innerHTML = `
+                    <div class="item-info">
+                        <h3>${item.name}</h3>
+                        <p>Price: KES ${item.selling_price} per ${item.unit.slice(0,-1)}</p>
+                    </div>
+                    <div class="item-actions">
+                        <span class="qty-badge">${item.quantity} <span style="font-size:10px;color:#666;">${item.unit}</span></span>
+                        <button class="btn-sell" onclick="sellItem('${item.name}', ${item.id}, ${item.quantity}, ${item.selling_price})">Sell 1</button>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
 
-  Paste and run the SQL below:
-
-  create table public.inventory (
-    id text primary key,
-    name text not null,
-    emoji text not null default '🍎',
-    unit text not null,
-    quantity numeric not null default 0 check (quantity >= 0),
-    cost_price numeric not null default 0 check (cost_price >= 0),
-    low_threshold numeric not null default 0 check (low_threshold >= 0),
-    updated_at timestamptz not null default now()
-  );
-
-  create table public.transactions (
-    id bigint generated by default as identity primary key,
-    type text not null check (type in ('sale', 'expense')),
-    amount numeric not null check (amount > 0),
-    payment_method text check (
-      payment_method in ('cash', 'mpesa')
-      or payment_method is null
-    ),
-    note text,
-    business_date date not null
-      default (
-        timezone('Africa/Nairobi', now())
-      )::date,
-    created_at timestamptz not null default now()
-  );
-
-  alter table public.inventory
-  enable row level security;
-
-  alter table public.transactions
-  enable row level security;
-
-  create policy "pilot inventory read"
-  on public.inventory
-  for select
-  to anon
-  using (true);
-
-  create policy "pilot inventory insert"
-  on public.inventory
-  for insert
-  to anon
-  with check (true);
-
-  create policy "pilot inventory update"
-  on public.inventory
-  for update
-  to anon
-  using (true)
-  with check (true);
-
-  create policy "pilot transactions read"
-  on public.transactions
-  for select
-  to anon
-  using (true);
-
-  create policy "pilot transactions insert"
-  on public.transactions
-  for insert
-  to anon
-  with check (true);
-
-  create index transactions_business_date_idx
-  on public.transactions (business_date desc);
-
-  create index transactions_created_at_idx
-  on public.transactions (created_at desc);
-
-  ==========================================================
-  FINAL SUPABASE STEPS
-  ==========================================================
-
-  1. Open Database > Replication or Publications.
-
-  2. Enable Realtime for:
-     - inventory
-     - transactions
-
-  3. Open Project Settings > API.
-
-  4. Copy your Project URL.
-
-  5. Replace YOUR_SUPABASE_URL near the top of the
-     JavaScript.
-
-  6. Copy your anon/public key.
-
-  7. Replace YOUR_SUPABASE_ANON_KEY.
-
-  Never put the service_role key inside this file.
-
-  These starter policies allow anyone who can access the
-  website to change the data. They are suitable only for a
-  private pilot. Add Supabase Authentication before allowing
-  the general public to use the management system.
-
-  The stock “− Sell” button reduces inventory only. You must
-  also enter the money received in Record a Sale so Cash and
-  M-PESA totals remain accurate.
-
-  ==========================================================
-  GITHUB CUSTOM DOMAIN
-  ==========================================================
-
-  Put a second file named CNAME in the same repository.
-
-  The CNAME file must contain exactly:
-
-  irrisfruits.com
-
-  ==========================================================
-  -->
-
-</body>
-</html>
+            document.getElementById('metric-sales').innerText = `KES ${totalSales.toLocaleString()}`;
+            document.getElementById('metric-stock-val').innerText = `KES ${currentStockValue.toLocaleString()}`;
+            
+            const netProfit = totalSales - totalExpenses;
