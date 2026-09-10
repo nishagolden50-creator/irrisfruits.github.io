@@ -5,25 +5,110 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#173f2a">
   <title>Irris Fruits Deli</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20260910-3">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <section id="auth" class="auth"><form id="login-form" class="auth-card"><div class="mark">🍊</div><p class="eyebrow">IRRIS FRUITS DELI</p><h1>Business control centre</h1><p class="muted">Secure owner access</p><label>Email<input id="email" type="email" value="nishagolden50@gmail.com" readonly></label><label>Password<input id="password" type="password" autocomplete="current-password" required></label><p id="auth-error" class="error"></p><button class="primary wide">Sign in securely</button></form></section>
+  <section id="auth" class="auth">
+    <form id="login-form" class="auth-card">
+      <div class="mark">🍊</div><p class="eyebrow">IRRIS FRUITS DELI</p><h1>Business control centre</h1>
+      <p class="muted">Secure owner and staff access</p>
+      <label>Email<input id="email" type="email" value="nishagolden50@gmail.com" autocomplete="username" required></label>
+      <label>Password<input id="password" type="password" autocomplete="current-password" required></label>
+      <p id="auth-error" class="error"></p><button class="primary wide">Sign in securely</button>
+    </form>
+  </section>
+
   <div id="app" class="hidden">
     <header><div><strong>Irris Fruits Deli</strong><small id="user-email"></small></div><button id="logout" class="ghost">Sign out</button></header>
-    <nav><button data-view="dashboard" class="active">⌂<span>Dashboard</span></button><button data-view="inventory">▦<span>Fruit inventory</span></button><button data-view="sales">＋<span>Sales</span></button><button data-view="expenses">◫<span>Expenses</span></button></nav>
+    <nav>
+      <button data-view="dashboard" class="active">⌂<span>Dashboard</span></button>
+      <button data-view="inventory">▦<span>Inventory</span></button>
+      <button data-view="sales">＋<span>Sales</span></button>
+      <button data-view="expenses">◫<span>Expenses</span></button>
+      <button data-view="more">•••<span>More</span></button>
+    </nav>
     <main>
-      <section id="dashboard" class="view active"><div class="page-head"><div><p class="eyebrow">OVERVIEW</p><h1>Today at a glance</h1></div><span id="today" class="chip"></span></div><div class="hero"><small>Today's revenue</small><strong id="today-sales">KES 0</strong><div><span>Net profit <b id="today-profit">KES 0</b></span><span>Transactions <b id="today-count">0</b></span></div></div><div class="metrics"><article><small>Fruit inventory value</small><strong id="stock-value">KES 0</strong></article><article><small>Today's expenses</small><strong id="today-expenses">KES 0</strong></article><article><small>M-Pesa received</small><strong id="mpesa-total">KES 0</strong></article><article><small>Low-stock products</small><strong id="low-count">0</strong></article></div><section class="panel"><div class="panel-head"><h2>Current fruit inventory</h2><button class="link" data-go="inventory">Manage</button></div><div id="dash-stock"></div></section></section>
-      <section id="inventory" class="view"><div class="page-head"><div><p class="eyebrow">STOCK</p><h1>Fruit inventory</h1></div><button id="new-product" class="primary">+ Add fruit</button></div><div id="inventory-list" class="panel list"></div></section>
-      <section id="sales" class="view"><div class="page-head"><div><p class="eyebrow">CHECKOUT</p><h1>Sales</h1></div><button id="new-sale" class="primary">+ New sale</button></div><div id="sales-list" class="panel list"></div></section>
-      <section id="expenses" class="view"><div class="page-head"><div><p class="eyebrow">COSTS</p><h1>Expenses & spoilage</h1></div><button id="new-expense" class="primary">+ Add expense</button></div><div id="expenses-list" class="panel list"></div></section>
+      <section id="dashboard" class="view active">
+        <div class="page-head"><div><p class="eyebrow">OVERVIEW</p><h1>Today at a glance</h1></div><span id="today" class="chip"></span></div>
+        <div class="hero"><small>Today's revenue</small><strong id="today-sales">KES 0</strong><div><span>Net profit <b id="today-profit">KES 0</b></span><span>Transactions <b id="today-count">0</b></span></div></div>
+        <div class="metrics"><article><small>Fruit inventory value</small><strong id="stock-value">KES 0</strong></article><article><small>Today's expenses</small><strong id="today-expenses">KES 0</strong></article><article><small>M-Pesa received</small><strong id="mpesa-total">KES 0</strong></article><article><small>Low-stock products</small><strong id="low-count">0</strong></article></div>
+        <section class="panel"><div class="panel-head"><h2>Current fruit inventory</h2><button class="link" data-go="inventory">Manage</button></div><div id="dash-stock"></div></section>
+      </section>
+
+      <section id="inventory" class="view">
+        <div class="page-head"><div><p class="eyebrow">STOCK</p><h1>Fruit inventory</h1></div><button id="new-product" class="primary">+ Add fruit</button></div>
+        <div id="inventory-list" class="panel list"></div>
+      </section>
+
+      <section id="sales" class="view">
+        <div class="page-head"><div><p class="eyebrow">CHECKOUT</p><h1>Sales</h1></div><button id="new-sale" class="primary">+ New sale</button></div>
+        <div id="mpesa-card" class="notice hidden"><strong>Manual M-Pesa payment</strong><span>Send payment to <b id="mpesa-display"></b>, then record the confirmation code below.</span></div>
+        <div id="sales-list" class="panel list"></div>
+      </section>
+
+      <section id="expenses" class="view">
+        <div class="page-head"><div><p class="eyebrow">COSTS</p><h1>Expenses & spoilage</h1></div><button id="new-expense" class="primary">+ Add expense</button></div>
+        <div id="expenses-list" class="panel list"></div>
+      </section>
+
+      <section id="more" class="view">
+        <div class="page-head"><div><p class="eyebrow">BUSINESS TOOLS</p><h1>More</h1></div></div>
+        <div class="tool-grid">
+          <button data-go="reports"><b>📊 Reports</b><span>Profit summaries & receipts</span></button>
+          <button data-go="contacts"><b>👥 Customers</b><span>Customers & suppliers</span></button>
+          <button data-go="purchases"><b>📦 Purchases</b><span>Restock from suppliers</span></button>
+          <button data-go="staff"><b>🔐 Staff</b><span>Roles & permissions</span></button>
+          <button data-go="settings"><b>📱 M-Pesa</b><span>Manual payment number</span></button>
+        </div>
+      </section>
+
+      <section id="reports" class="view">
+        <div class="page-head"><div><p class="eyebrow">REPORTS</p><h1>Business reports</h1></div><button class="ghost" data-go="more">Back</button></div>
+        <section class="panel report-controls"><label>Report month<input id="report-month" type="month"></label><button id="print-report" class="primary">Print report</button></section>
+        <div class="metrics report-metrics"><article><small>Revenue</small><strong id="report-revenue">KES 0</strong></article><article><small>Gross profit</small><strong id="report-gross">KES 0</strong></article><article><small>Expenses</small><strong id="report-expenses">KES 0</strong></article><article><small>Net profit</small><strong id="report-profit">KES 0</strong></article></div>
+        <section class="panel"><div class="panel-head"><h2>Payment breakdown</h2></div><div id="payment-report"></div></section>
+      </section>
+
+      <section id="contacts" class="view">
+        <div class="page-head"><div><p class="eyebrow">PEOPLE</p><h1>Customers & suppliers</h1></div><button class="ghost" data-go="more">Back</button></div>
+        <div class="tabs"><button class="active" data-contact-tab="customers">Customers</button><button data-contact-tab="suppliers">Suppliers</button></div>
+        <div id="customer-tools"><button id="new-customer" class="primary action-top">+ Add customer</button><div id="customers-list" class="panel list"></div></div>
+        <div id="supplier-tools" class="hidden"><button id="new-supplier" class="primary action-top">+ Add supplier</button><div id="suppliers-list" class="panel list"></div></div>
+      </section>
+
+      <section id="purchases" class="view">
+        <div class="page-head"><div><p class="eyebrow">RESTOCK</p><h1>Supplier purchases</h1></div><button id="new-purchase" class="primary">+ New purchase</button></div>
+        <div id="purchases-list" class="panel list"></div>
+      </section>
+
+      <section id="staff" class="view">
+        <div class="page-head"><div><p class="eyebrow">ACCESS</p><h1>Staff accounts</h1></div><button id="new-staff" class="primary">+ Add staff</button></div>
+        <div class="notice"><strong>Safe staff access</strong><span>Add an employee's email and role here. Their Supabase login must be created separately before they can sign in.</span></div>
+        <div id="staff-list" class="panel list"></div>
+      </section>
+
+      <section id="settings" class="view">
+        <div class="page-head"><div><p class="eyebrow">PAYMENTS</p><h1>Manual M-Pesa</h1></div><button class="ghost" data-go="more">Back</button></div>
+        <form id="mpesa-form" class="panel form-panel"><p class="muted">This number stays on this device and does not change Supabase.</p><label>M-Pesa phone number<input id="mpesa-number" type="tel" placeholder="07XX XXX XXX" autocomplete="tel"></label><button class="primary wide">Save number privately</button></form>
+      </section>
     </main>
   </div>
+
   <dialog id="product-dialog"><form id="product-form" class="modal"><div class="modal-head"><h2 id="product-title">Add fruit</h2><button type="button" data-close>×</button></div><input id="product-id" type="hidden"><label>Fruit name<input id="product-name" required></label><div class="two"><label>Quantity<input id="product-qty" type="number" min="0" step=".01" required></label><label>Unit<select id="product-unit"><option>pieces</option><option>bunches</option><option>kilograms</option><option>packets</option><option>crates</option></select></label></div><div class="two"><label>Cost each (KES)<input id="product-cost" type="number" min="0" step=".01" required></label><label>Selling price (KES)<input id="product-price" type="number" min="0" step=".01" required></label></div><label>Low-stock warning<input id="product-low" type="number" min="0" step=".01" value="10" required></label><button class="primary wide">Save fruit</button></form></dialog>
-  <dialog id="sale-dialog"><form id="sale-form" class="modal"><div class="modal-head"><h2 id="sale-title">Record sale</h2><button type="button" data-close>×</button></div><input id="sale-id" type="hidden"><label>Fruit<select id="sale-product" required></select></label><div class="two"><label>Quantity<input id="sale-qty" type="number" min=".01" step=".01" value="1" required></label><label>Price each (KES)<input id="sale-price" type="number" min="0" step=".01" required></label></div><label>Payment method<select id="sale-payment"><option>M-Pesa</option><option>Cash</option><option>Bank</option><option>Credit</option></select></label><label>M-Pesa code (optional)<input id="sale-code" maxlength="20" placeholder="e.g. QAB12CD345"></label><button class="primary wide">Save sale</button><button id="void-sale" type="button" class="danger wide hidden">Void sale and restore stock</button></form></dialog>
+
+  <dialog id="sale-dialog"><form id="sale-form" class="modal"><div class="modal-head"><h2 id="sale-title">Record sale</h2><button type="button" data-close>×</button></div><input id="sale-id" type="hidden"><label>Fruit<select id="sale-product" required></select></label><label>Customer (optional)<select id="sale-customer"><option value="">Walk-in customer</option></select></label><div class="two"><label>Quantity<input id="sale-qty" type="number" min=".01" step=".01" value="1" required></label><label>Price each (KES)<input id="sale-price" type="number" min="0" step=".01" required></label></div><label>Payment method<select id="sale-payment"><option>M-Pesa</option><option>Cash</option><option>Bank</option><option>Credit</option></select></label><div id="sale-mpesa-help" class="field-help"></div><label>M-Pesa code (optional)<input id="sale-code" maxlength="20" placeholder="e.g. QAB12CD345"></label><button class="primary wide">Save sale</button><button id="void-sale" type="button" class="danger wide hidden">Void sale and restore stock</button></form></dialog>
+
   <dialog id="expense-dialog"><form id="expense-form" class="modal"><div class="modal-head"><h2 id="expense-title">Add expense</h2><button type="button" data-close>×</button></div><input id="expense-id" type="hidden"><label>Category<select id="expense-category"><option>Transport</option><option>Spoilage</option><option>Packaging</option><option>County fee</option><option>Rent</option><option>Other</option></select></label><label>Amount (KES)<input id="expense-amount" type="number" min="1" step=".01" required></label><label>Note<input id="expense-note" maxlength="200"></label><button class="primary wide">Save expense</button></form></dialog>
+
+  <dialog id="contact-dialog"><form id="contact-form" class="modal"><div class="modal-head"><h2 id="contact-title">Add contact</h2><button type="button" data-close>×</button></div><input id="contact-id" type="hidden"><input id="contact-type" type="hidden"><label>Name<input id="contact-name" required maxlength="100"></label><label>Phone number<input id="contact-phone" type="tel" maxlength="30"></label><label>Notes<input id="contact-notes" maxlength="200"></label><button class="primary wide">Save</button></form></dialog>
+
+  <dialog id="purchase-dialog"><form id="purchase-form" class="modal"><div class="modal-head"><h2>Record supplier purchase</h2><button type="button" data-close>×</button></div><label>Supplier<select id="purchase-supplier" required></select></label><label>Fruit<select id="purchase-product" required></select></label><div class="two"><label>Quantity received<input id="purchase-qty" type="number" min=".01" step=".01" required></label><label>Cost each (KES)<input id="purchase-cost" type="number" min="0" step=".01" required></label></div><label>Note<input id="purchase-note" maxlength="200"></label><button class="primary wide">Save purchase & add stock</button></form></dialog>
+
+  <dialog id="staff-dialog"><form id="staff-form" class="modal"><div class="modal-head"><h2>Add staff member</h2><button type="button" data-close>×</button></div><label>Employee name<input id="staff-name" maxlength="100" required></label><label>Employee email<input id="staff-email" type="email" autocomplete="off" required></label><label>Role<select id="staff-role"><option value="cashier">Cashier — sales only</option><option value="stock_manager">Stock manager — inventory & purchases</option><option value="manager">Manager — everything except staff settings</option></select></label><button class="primary wide">Save staff permission</button></form></dialog>
+
+  <dialog id="receipt-dialog"><section class="modal receipt"><div class="modal-head no-print"><h2>Customer receipt</h2><button type="button" data-close>×</button></div><div id="receipt-content"></div><button id="print-receipt" class="primary wide no-print">Print receipt</button></section></dialog>
   <div id="toast" class="toast"></div>
-  <script src="app.js?v=20260910-2"></script>
+  <script src="app.js?v=20260910-3"></script>
 </body>
 </html>
