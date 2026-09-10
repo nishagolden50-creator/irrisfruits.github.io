@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iris Fruits Deli - Inventory System</title>
-    <!-- Supabase CDN Link -->
-    <script src="https://jsdelivr.net"></script>
+    <!-- Fixed Supabase CDN Link -->
+    <script src="https://unpkg.com"></script>
     <style>
         :root {
             --bg-color: #f7f6f0;
@@ -128,12 +128,10 @@
         }
 
         async function initApp() {
-            // Target the lower-case 'inventory' table name exactly to bypass the database lock
             const { data, error } = await _supabase.from('inventory').select('*');
-            if (!error && data) {
+            if (!error && data && data.length > 0) {
                 localInventory = data;
             } else {
-                // If the data sheet is completely blank, load premium deli starter rows automatically
                 localInventory = [
                     { name: 'Bananas', quantity: 50, unit: 'bunches', cost_price: 150, selling_price: 200 },
                     { name: 'Mangoes', quantity: 80, unit: 'pieces', cost_price: 30, selling_price: 50 },
@@ -178,3 +176,13 @@
                 return item;
             });
             totalSales += price;
+            renderApp();
+        }
+
+        function logExpense(amount, description) {
+            totalExpenses += amount;
+            renderApp();
+        }
+    </script>
+</body>
+</html>
